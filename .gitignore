@@ -1,0 +1,25 @@
+# secrets
+.env
+*.env
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# local runs / outputs
+evolve_demo_run/
+storage/agent_kb/
+storage/agent_kb_round*/
+storage/tools/__pycache__/
+
+# large models / artifacts
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# datasets (optional, recommended)
+data/gaia/validation*
+data/gaia/validation/
