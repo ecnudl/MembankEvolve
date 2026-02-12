@@ -263,7 +263,7 @@ Below is an example provider for reference. You should implement your own innova
             response = self.openai_client.chat.completions.create(
                 model=self.model_id,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=60000,
+                max_tokens=8192,  # Use maximum allowed by qwen-plus
                 temperature=temperature
             )
             

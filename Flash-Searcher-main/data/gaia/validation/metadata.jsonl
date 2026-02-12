@@ -1,0 +1,3 @@
+{"task_id": "gaia-001", "Question": "In which year did the author of 'The Great Gatsby' die? Please search for the answer and provide only the year as a 4-digit number.", "Final answer": "1940", "Level": 1, "file_name": ""}
+{"task_id": "gaia-002", "Question": "What is the atomic number of the chemical element that has the symbol 'Fe'? First, identify what element 'Fe' represents, then find its atomic number.", "Final answer": "26", "Level": 1, "file_name": ""}
+{"task_id": "gaia-003", "Question": "How many countries border France? Please search for this information and count all countries that share a land border with France (not including overseas territories).", "Final answer": "8", "Level": 2, "file_name": ""}

@@ -99,7 +99,7 @@ def openai_service(
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            max_tokens=16000,
+            max_tokens=8000,  # Adjusted for qwen-plus limit (max 8192)
             timeout=timeout
         )
         

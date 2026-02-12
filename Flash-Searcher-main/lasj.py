@@ -45,7 +45,7 @@ def save_results(results, output_file):
         for result in results:
             f.write(json.dumps(result, ensure_ascii=False) + '\n')
 
-def judge_equivalence(question, gt_answer, pred_answer, model="gpt-4.1-mini"):
+def judge_equivalence(question, gt_answer, pred_answer, model="qwen-plus"):
     try:
         pred_answer = pred_answer["answer"]
     except Exception as e:
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--input_file", default="./data/<example.json>", help="Path to input JSONL file containing questions, answers and agent results")
     parser.add_argument("--output_file", default="./output/<example.jsonl>", help="Path to save judgement results (JSONL)")
-    parser.add_argument("--model", default="gpt-4.1-mini", help="OpenAI model to use for judging")
+    parser.add_argument("--model", default="qwen-plus", help="OpenAI model to use for judging")
     parser.add_argument("--sample_size", type=int, help="Number of items to process (optional)")
     parser.add_argument("--max_workers", type=int, default=20, help="Number of parallel workers for API calls")
     

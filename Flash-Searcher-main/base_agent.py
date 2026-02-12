@@ -134,7 +134,10 @@ class MMSearchAgent(BaseAgent):
 class AnalysisAgent(BaseAgent):
     """Agent for analyzing task execution trajectories"""
     
-    def __init__(self, model, task_logs_dir, prompts_type="default", max_steps=15, summary_model_id="gpt-4o-mini", **kwargs):
+    def __init__(self, model, task_logs_dir, prompts_type="default", max_steps=15, summary_model_id=None, **kwargs):
+        if summary_model_id is None:
+            import os
+            summary_model_id = os.getenv("DEFAULT_MODEL", "qwen-plus")
         super().__init__(model)
         
         from MemEvolve.utils.trajectory_tools import (

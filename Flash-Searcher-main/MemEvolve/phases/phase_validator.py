@@ -450,7 +450,7 @@ class PhaseValidator:
                 model_config = {
                     "model_id": os.environ.get("DEFAULT_MODEL"),
                     "custom_role_conversions": custom_role_conversions,
-                    "max_completion_tokens": 32768,
+                    "max_completion_tokens": 8000,  # Adjusted for qwen-plus limit (max 8192)
                     "api_key": os.environ.get("OPENAI_API_KEY"),
                     "api_base": os.environ.get("OPENAI_API_BASE"),
                 }
