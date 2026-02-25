@@ -1,0 +1,263 @@
+{
+  "experiment": "memory_extraction_test",
+  "prompt_source": "./insights_prompt.txt",
+  "total_tasks": 10,
+  "successful_extractions": 10,
+  "llm_calls": 4,
+  "skipped_success": 6,
+  "timestamp": "2026-02-25T11:44:06.584379",
+  "model": "qwen-plus",
+  "results": [
+    {
+      "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+      "task_order": 1,
+      "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": false,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    },
+    {
+      "task_id": "17b5a6a3-bc87-42e8-b0fb-6ab0781ef2cc",
+      "task_order": 1,
+      "question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    },
+    {
+      "task_id": "c61d22de-5f6c-4958-a7f6-5e9707bd3466",
+      "task_order": 1,
+      "question": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": false,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    },
+    {
+      "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+      "task_order": 2,
+      "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+      "is_success": false,
+      "memory_count_before": 1,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": "The agent misinterpreted the syntactic role of the backtick (`) as irrelevant to correction and instead inferred 'newline' from the presence of 'r', ignoring the log-evidenced fact that the code is missing an application operator to chain the `.F`, `.o`, etc. primitives.",
+        "state_mismatch_analysis": "Expected: backtick; Actual: newline",
+        "divergence_point": "[Step 3 - Action]: Concluded 'newline' based on 'r' without verifying required application syntax, ignoring the observed Unlambda rule that each '.x' must be applied to its successor via '`' and that the given code has insufficient backticks to link all print primitives.",
+        "failure_knowledge_graph": [
+          [
+            "Unlambda syntax",
+            "requires application operator",
+            "backtick (`) between function and argument"
+          ],
+          [
+            "Code",
+            "contains sequence",
+            "`.F.o.r. .p.e.n.g.u.i.n.si`"
+          ],
+          [
+            "Observation from crawl_page",
+            "states",
+            "Application of F to G is written `FG"
+          ],
+          [
+            "Observation from crawl_page",
+            "states",
+            "`.x` prints the character `x` as a side effect and returns its argument"
+          ]
+        ]
+      }
+    },
+    {
+      "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+      "task_order": 3,
+      "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+      "is_success": false,
+      "memory_count_before": 2,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": "The agent computed time as 356,400 km ÷ 20.9 km/h ≈ 17,052 hours and rounded to 17000, but failed to recognize that the task required rounding to the nearest *thousand hours* as a *numerical value without comma separators*, and misinterpreted '17000' as satisfying the instruction when the expected output was the integer 17 (representing 17 thousand hours), not 17000 hours.",
+        "state_mismatch_analysis": "Expected: 17; Actual: 17000",
+        "divergence_point": "[Step 3 - Action]: final_answer({\"answer\": \"17000\"})",
+        "failure_knowledge_graph": [
+          [
+            "final_answer tool call",
+            "submitted string value",
+            "17000"
+          ],
+          [
+            "task_query",
+            "requires rounding to nearest 1000 hours and output as integer without commas",
+            "17"
+          ],
+          [
+            "failure_reason",
+            "states expected answer is '17'",
+            "17"
+          ],
+          [
+            "computation in Step 3",
+            "produced ~17,052 hours",
+            "17000"
+          ]
+        ]
+      }
+    },
+    {
+      "task_id": "32102e3e-d12a-4209-9163-7b3a104efe5d",
+      "task_order": 4,
+      "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.\n\nTo solve the task above, you will have to use this attached file: - Attached document: data/gaia/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx\n     -> File description: Document content: This is a 28 rows and 5 columns table. The content is shown below:\nFlop Video Rental Store 1001 Rewind Drive, Seattle WA None None None \nNone None None None None \nTitle Genre Year Platform Status \nDVD None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Available(41FB73) \nBreathtaking: The Keanu Reeves Story Biopic 2023.0 None Rented \nThe Widest Goalpost Sports 2021.0 None Overdue \nCereal Killer IV: No Milk Horror 2012.0 None Missing \nShiny Vampire Car Chase Action 2013.0 None Missing \nPeople Hanging Out Together Comedy 2020.0 None Missing \nBlu-Ray None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Missing \nCereal Killer III: Incomplete Breakfast Horror 2011.0 None Rented \nWindshield Bug: The First Ten Seasons Comedy 2016.0 None Rented \nA Protist's Life Documentary 2018.0 None Available(41FB73) \nMy Neighbor Is A Shrimp Farmer Anime 2022.0 None Available(41FB73) \nDogs and Croatia: A Movie About Both These Things Adventure 2023.0 None Overdue \nVideo Games None None None None \nFirst-Person Scooter Racing 2019.0 Nintendo Switch Missing \nThe Locked Door RPG 2021.0 Playstation 5 Available(41FB73) \nShopping Cart Raceway Racing 2005.0 Nintendo Gamecube Rented \nNo Lights Horror 2004.0 Xbox Overdue \nEraser Simulator Simulation 2018.0 Nintendo Switch Available(41FB73) \nGilbert Gopher Goes to Greece Platformer 1995.0 Super Nintendo Rented \nSkirmish Fighting 2008.0 Xbox 360 Available(41FB73) \nCool: The Game Platformer 1994.0 Sega Genesis Overdue \nDinosaur Accountant Simulation 1989.0 Nintendo Entertainment System Available(41FB73) \nFour Controllers Party 2009.0 Nintendo Wii Overdue ",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    },
+    {
+      "task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be",
+      "task_order": 4,
+      "question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    },
+    {
+      "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+      "task_order": 5,
+      "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+      "is_success": false,
+      "memory_count_before": 4,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": "The agent misinterpreted 'when Regression was added' as the date of a regression test commit (12/23/14) instead of the timestamp of the GitHub label addition event, and ignored the absence of any 'Regression' label in the crawled issue's actual labels or timeline.",
+        "state_mismatch_analysis": "Expected: 04/15/18; Actual: 12/23/14",
+        "divergence_point": "[Step 2 - Action]: crawled https://github.com/numpy/numpy/issues/5354 and accepted 'Dec 23, 2014' — a commit date for regression tests — as the label addition timestamp, despite the query requiring the GitHub event when the 'Regression' label was applied to the issue, and despite no observation confirming that label existed on that issue at all.",
+        "failure_knowledge_graph": [
+          [
+            "issue #5354",
+            "has labels array containing",
+            "no mention of 'Regression' label in crawl_page observation"
+          ],
+          [
+            "crawl_page result for #5354",
+            "contains only",
+            "commits adding regression tests, not label events"
+          ],
+          [
+            "crawl_page result for #5354",
+            "lacks",
+            "any labeled event or metadata indicating 'Regression' label was ever added to the issue"
+          ],
+          [
+            "final_answer",
+            "was generated from",
+            "Dec 23, 2014 commit date, not a GitHub label addition timestamp"
+          ]
+        ]
+      }
+    },
+    {
+      "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+      "task_order": 6,
+      "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+      "is_success": false,
+      "memory_count_before": 5,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": "The agent prematurely terminated analysis at Step 4 with final_answer('1') without simulating or verifying the deterministic ejection behavior described in the task, ignoring the explicit mechanical asymmetry that makes ball 3 uniquely eligible for immediate ejection in the first firing round.",
+        "state_mismatch_analysis": "Expected: 3; Actual: 1",
+        "divergence_point": "[Step 4 - Action]: issued final_answer({'answer': '1'}) despite no simulation, derivation, or mechanical verification supporting ball 1 as optimal, and contrary to the system's initial state where only ball 3 occupies the third position — the only position whose ejection triggers ramp advancement without prior displacement of earlier balls.",
+        "failure_knowledge_graph": [
+          [
+            "Step 4 - Action",
+            "issued_final_answer",
+            "1"
+          ],
+          [
+            "Task Query",
+            "specifies_piston_effect_on_third_position",
+            "ejecting ball in third position releases ball in first position and advances next two balls from ramp"
+          ],
+          [
+            "Initial platform state",
+            "contains_balls",
+            "[1, 2, 3]"
+          ],
+          [
+            "Piston firing on third position",
+            "enables_immediate_ejection_of_ball",
+            "3"
+          ],
+          [
+            "Step 0 - Plan",
+            "lists_Goal_1.1",
+            "Enumerate piston effects on ball positions — unexecuted"
+          ]
+        ]
+      }
+    },
+    {
+      "task_id": "3627a8be-a77f-41bb-b807-7e1bd4c0ebdf",
+      "task_order": 8,
+      "question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+      "is_success": true,
+      "memory_count_before": 7,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "root_cause_conclusion": null,
+        "state_mismatch_analysis": null,
+        "divergence_point": null,
+        "failure_knowledge_graph": [],
+        "skipped": true,
+        "skipped_reason": "is_success is true; diagnostics is failure-only."
+      }
+    }
+  ]
+}

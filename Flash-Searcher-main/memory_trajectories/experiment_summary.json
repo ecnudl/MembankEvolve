@@ -1,0 +1,72 @@
+{
+  "experiment": "memory_interaction_trajectories",
+  "description": "Sequential tasks with cross-task memory accumulation",
+  "memory_provider": "agent_kb",
+  "total_tasks": 6,
+  "correct_tasks": 2,
+  "accuracy": 0.3333333333333333,
+  "timestamp": "2026-02-23T21:23:17.949789",
+  "model": "gpt-4o",
+  "task_results": [
+    {
+      "task_order": 1,
+      "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+      "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc",
+      "is_correct": true,
+      "agent_result": "41",
+      "golden_answer": "41",
+      "memory_count_before": 0,
+      "has_memory_guidance": true
+    },
+    {
+      "task_order": 2,
+      "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+      "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"",
+      "is_correct": false,
+      "agent_result": "newline",
+      "golden_answer": "backtick",
+      "memory_count_before": 1,
+      "has_memory_guidance": true
+    },
+    {
+      "task_order": 3,
+      "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+      "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hou",
+      "is_correct": false,
+      "agent_result": "17000",
+      "golden_answer": "17",
+      "memory_count_before": 2,
+      "has_memory_guidance": true
+    },
+    {
+      "task_order": 4,
+      "task_id": "32102e3e-d12a-4209-9163-7b3a104efe5d",
+      "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Was",
+      "is_correct": true,
+      "agent_result": "Time-Parking 2: Parallel Universe",
+      "golden_answer": "Time-Parking 2: Parallel Universe",
+      "memory_count_before": 3,
+      "has_memory_guidance": true
+    },
+    {
+      "task_order": 5,
+      "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+      "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has ",
+      "is_correct": false,
+      "agent_result": "12/23/14",
+      "golden_answer": "04/15/18",
+      "memory_count_before": 4,
+      "has_memory_guidance": true
+    },
+    {
+      "task_order": 6,
+      "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+      "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of th",
+      "is_correct": false,
+      "agent_result": "1",
+      "golden_answer": "3",
+      "memory_count_before": 5,
+      "has_memory_guidance": true
+    }
+  ]
+}

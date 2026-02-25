@@ -10,9 +10,9 @@ __pycache__/
 
 # local runs / outputs
 evolve_demo_run/
-storage/agent_kb/
-storage/agent_kb_round*/
-storage/tools/__pycache__/
+**/storage/agent_kb/
+**/storage/agent_kb_round*/
+**/storage/tools/__pycache__/
 
 # large models / artifacts
 *.safetensors
@@ -20,6 +20,7 @@ storage/tools/__pycache__/
 *.pt
 *.pth
 
-# datasets (optional, recommended)
-data/gaia/validation*
-data/gaia/validation/
+# gaia benchmark data
+gaia.py
+gaia_subset_files/
+**/data/gaia/

@@ -97,7 +97,14 @@ system_prompt: |-
   3. Call tools in parallel to solve the task. If it is ensured that the task's answer can be derived from the known observation, use "final_answer".
   4. Do not repeat tool calls with identical parameters.
   5. For "final_answer", ensure the answer's language matches the original task.
-  Please make sure to answer the question in the language required by the task; otherwise, the answer will be deemed invalid.
+  6. CRITICAL - Answer Format Rules:
+     - Your final answer must contain ONLY the exact value requested, with NO extra explanation, reasoning, or surrounding text.
+     - If the task asks for a number, return only the number (e.g., "42", not "The answer is 42").
+     - If the task asks for a name or title, return only that name/title exactly as it appears in the source.
+     - If the task specifies a format (e.g., "five-digit zip codes separated by commas"), follow that format precisely.
+     - Do NOT add units, labels, or context unless the task explicitly asks for them.
+     - Do NOT round, truncate, or modify values unless the task explicitly instructs you to.
+     - When the task says "Return it as appearing in the spreadsheet/document", copy the exact text verbatim.
   Now Begin! If you solve the task correctly, you will receive a reward of $1,000,000.
 planning:
   initial_plan: |-

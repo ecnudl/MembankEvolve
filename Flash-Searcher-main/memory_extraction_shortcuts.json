@@ -1,0 +1,635 @@
+{
+  "experiment": "memory_extraction_test",
+  "prompt_source": "built-in",
+  "total_tasks": 10,
+  "successful_extractions": 10,
+  "llm_calls": 10,
+  "skipped_success": 0,
+  "timestamp": "2026-02-24T00:43:49.751642",
+  "model": "qwen-plus",
+  "results": [
+    {
+      "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+      "task_order": 1,
+      "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": false,
+      "extracted_memory": [
+        {
+          "name": "estimate_false_positives_from_uniform_p_value_threshold",
+          "description": "Estimates the number of false positive claims in a journal's annual research output, assuming p-values under the null are uniformly distributed and a mean published p-value threshold is given.",
+          "precondition": "The total count of research articles (excluding non-research content) and the mean reported p-value are known or extractable.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access for web search and page crawling",
+            "Nature's article metadata is publicly available via nature.com/articles?year=YYYY with type-classified counts",
+            "Under H₀, p-values ≤ α occur with probability α (uniform null distribution)",
+            "Rounding up to the next integer is required per task specification"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Search for the number of Nature research articles published in a given year, using official journal archive URL pattern.",
+              "executable_payload": "web_search({\"query\": \"Nature journal number of articles published in <YEAR>\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Crawl Nature's yearly archive page to extract the count of 'Article'-type research papers, excluding book reviews and columns, as observed in the trajectory.",
+              "executable_payload": "crawl_page({\"url\": \"https://www.nature.com/nature/articles?year=<YEAR>\", \"query\": \"Identify the total number of research articles published by Nature in <YEAR>, excluding book reviews or columns.\"})"
+            },
+            {
+              "step": 3,
+              "intent": "Compute ceiling of (<ARTICLE_COUNT> * <P_VALUE>) to obtain minimum expected false positives under uniform null assumption.",
+              "executable_payload": "final_answer({\"answer\": \"<COMPUTED_VALUE>\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "17b5a6a3-bc87-42e8-b0fb-6ab0781ef2cc",
+      "task_order": 1,
+      "question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "resolve_taxonomic_identity_via_authoritative_biology_sources",
+          "description": "Resolves ambiguous common-to-scientific species mappings using parallel web searches against consensus biological databases (e.g., FishBase, WoRMS) and educational sources, prioritizing explicit taxonomic clarification over cinematic naming.",
+          "precondition": "A pop-culture-referenced organism requires unambiguous scientific identification for downstream ecological or regulatory database lookup.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access is available",
+            "Authoritative biology sources (e.g., MarineBio, A-Z Animals, FishBase, WoRMS) are indexable via standard web search",
+            "Search queries using quoted binomial names and comparative phrasing ('vs') yield disambiguating results"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Execute parallel web searches comparing the two most likely candidate species using authoritative biological terminology and source domains.",
+              "executable_payload": "web_search({\"query\": \"\\\"Finding Nemo\\\" clownfish species \\\"Amphiprion percula\\\" vs \\\"Amphiprion ocellaris\\\" FishBase WoRMS\"})"
+            }
+          ]
+        },
+        {
+          "name": "locate_usgs_nas_occurrence_by_species_id_and_validate_geography",
+          "description": "Finds a USGS Nonindigenous Aquatic Species (NAS) record by resolving the species’ official SpeciesID via NAS domain search, then extracts geolocated nonnative occurrence(s) — including county, state, and collection date — from the canonical FactSheet and Collections pages.",
+          "precondition": "A scientifically validated species name exists, but direct NAS site: queries return no hits, requiring fallback to NAS infrastructure navigation (e.g., Map Viewer → SpeciesID → FactSheet).",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access is available",
+            "USGS NAS uses stable URL patterns: FactSheet.aspx?speciesID=<ID>, collectioninfo.aspx?SpeciesID=<ID>",
+            "The NAS FactSheet page contains a 'Nonindigenous Occurrences' section listing county, state, location, and year of collection",
+            "The Collections page provides specimen-level metadata sufficient to confirm spatial and temporal scope"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Discover the NAS SpeciesID for the confirmed species by searching NAS domain with common name variants when binomials fail.",
+              "executable_payload": "web_search({\"query\": \"'USGS NAS' 'clownfish' 'Amphiprion' 'nonindigenous' site:nas.er.usgs.gov\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Retrieve the official occurrence summary from the NAS FactSheet using the resolved SpeciesID, extracting state, county, location, and year of collection.",
+              "executable_payload": "crawl_page({\"url\": \"https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=<SPECIES_ID>\", \"query\": \"Nonindigenous Occurrences, county, state, location, record, date, year, 2019, 2018, 2017, 2016, Florida, Hawaii, California\"})"
+            }
+          ]
+        },
+        {
+          "name": "geocode_locality_to_zip_code_via_official_government_or_realty_sources",
+          "description": "Converts a USGS-documented nonnative occurrence locality (e.g., park name + county + state) into one or more five-digit ZIP codes using authoritative local government or real estate domain searches, leveraging address fragments and geographic context.",
+          "precondition": "A precise physical location (e.g., 'Fred Howard Park, Pinellas County, FL') is confirmed in an official ecological database, but ZIP code is absent from that source.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access is available",
+            "Local government websites (e.g., pinellas.gov) or real estate platforms (e.g., Zillow) reliably publish ZIP codes alongside park addresses",
+            "Searches combining park name, county, and state yield unambiguous ZIP code matches in top results"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Perform a targeted web search for the park’s official address and associated ZIP code using county and state qualifiers.",
+              "executable_payload": "web_search({\"query\": \"\\\"Fred Howard Park\\\" \\\"Pinellas County\\\" \\\"Florida\\\" zip code\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "c61d22de-5f6c-4958-a7f6-5e9707bd3466",
+      "task_order": 1,
+      "question": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": false,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "arxiv_paper_search_and_label_extraction",
+          "description": "Finds an arXiv paper by date, domain, and structural keywords (e.g., 'three-axis'), then extracts axis-end labels from its PDF using text-based figure caption analysis.",
+          "precondition": "A task requires identifying a specific arXiv paper submitted in a given month/year, containing a multi-axis diagram, and extracting the exact endpoint label words from that diagram.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access to arXiv.org and search engines",
+            "The target paper has a figure explicitly labeled with axis endpoints in its caption or surrounding text",
+            "The arXiv ID can be reliably extracted from search result metadata (e.g., 'arXiv:2207.01510', submission date 'Jun 8, 2022')"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Perform parallel web search for arXiv papers matching temporal (e.g., June 2022), topical ('AI regulation'), and structural ('three-axis' OR 'triangular' OR '3D governance') constraints.",
+              "executable_payload": "web_search({\"query\": \"arXiv <TOPIC> <YEAR>-<MONTH> <STRUCTURAL_KEYWORDS>\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Extract arXiv ID (e.g., '2207.01510') and confirm submission date from top search result snippet; construct PDF URL as 'https://arxiv.org/pdf/<ARXIV_ID>.pdf'.",
+              "executable_payload": "inspect_file_as_text({\"file_path\": \"https://arxiv.org/pdf/<ARXIV_ID>.pdf\", \"question\": \"What are the label words at both ends of each of the three axes in Figure 1? Extract the exact terms used.\"})"
+            }
+          ]
+        },
+        {
+          "name": "usgs_nas_species_locality_to_zipcode",
+          "description": "Resolves a nonindigenous aquatic species’ geolocated USGS NAS occurrence record to its corresponding five-digit ZIP code using authoritative local government sources when NAS pages omit postal codes.",
+          "precondition": "A verified USGS NAS SpeciesID exists for a species, and its FactSheet lists a precise nonindigenous occurrence (e.g., 'Fred Howard Park, Pinellas Co., Florida'), but no ZIP code is provided on NAS pages.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Network access to USGS NAS and local government websites (e.g., county parks departments)",
+            "The occurrence location maps unambiguously to a single incorporated place or ZIP code (e.g., Fred Howard Park → Tarpon Springs, FL → 34689)",
+            "Local government or real estate portals publish ZIP code mappings for public facilities"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Crawl the USGS NAS FactSheet page for <SPECIES_ID> to extract the precise occurrence locality (e.g., park name, county, state).",
+              "executable_payload": "crawl_page({\"url\": \"https://nas.er.usgs.gov/queries/FactSheet.aspx?speciesID=<SPECIES_ID>\", \"query\": \"Nonindigenous Occurrences, county, state, location\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Search for the extracted locality (e.g., 'Fred Howard Park Pinellas County Florida') paired with 'zip code' to retrieve authoritative ZIP code(s) from municipal or real estate sources.",
+              "executable_payload": "web_search({\"query\": \"<LOCALITY> <STATE> zip code\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+      "task_order": 2,
+      "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+      "is_success": false,
+      "memory_count_before": 1,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "unlambda_syntax_diagnostic_search",
+          "description": "Performs parallel web searches to identify authoritative Unlambda documentation, common pitfalls, and accessible interpreters — a foundational diagnostic step before syntax correction.",
+          "precondition": "A Unlambda program fails to produce expected output and its syntactic correctness is unknown.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Network access is available",
+            "The terms 'Unlambda', 'syntax', 'primitives', 'debugging', and 'interpreter' are stable search keywords across documentation sources"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The agent incorrectly assumed 'r' alone suffices for newline output, but Unlambda requires explicit application syntax: 'r' must be *applied* (i.e., preceded by a backtick) to trigger evaluation and side effect — the missing token is the backtick (`), not the conceptual 'newline'.",
+            "correction_hint": "In Unlambda, all function applications require the backtick operator; '.x' prints x but 'r' (newline) must appear as `r to be applied and executed."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Initiate parallel discovery of Unlambda fundamentals: syntax/primitives (from official source), debugging patterns (community-observed), and executable environment (online interpreter).",
+              "executable_payload": "web_search({\"query\": \"Unlambda programming language syntax and primitives documentation\"}); web_search({\"query\": \"common debugging issues in Unlambda programming\"}); web_search({\"query\": \"online Unlambda interpreter\"})"
+            }
+          ]
+        },
+        {
+          "name": "unlambda_primitive_verification_crawl",
+          "description": "Crawls top-ranked Unlambda documentation pages to extract and cross-validate primitive function definitions and application rules — critical for distinguishing between standalone tokens (e.g., 'r') and required syntactic scaffolding (e.g., '`r').",
+          "precondition": "Web search results identify canonical Unlambda documentation URLs (e.g., madore.org, esolangs.org) containing authoritative syntax descriptions.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Network access is available",
+            "The crawled pages contain plaintext or parseable HTML with unambiguous definitions of primitives like 'r', '.x', and the backtick application operator"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The agent stopped after identifying 'r' as the newline primitive but skipped verifying *how it must be invoked*: the crawl revealed that 'r' is a function requiring application (``r`), yet the agent treated it as a self-executing literal.",
+            "correction_hint": "All Unlambda primitives — including 'r' — are inert without application; the minimal fix is prepending a backtick to apply it, turning 'r' into '`r'."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Crawl authoritative Unlambda documentation pages to extract definitive syntax rules for primitive functions and application notation.",
+              "executable_payload": "crawl_page({\"url\": \"http://www.madore.org/~david/programs/unlambda/\", \"query\": \"Unlambda syntax and primitives documentation\"}); crawl_page({\"url\": \"https://esolangs.org/wiki/Unlambda\", \"query\": \"Unlambda syntax and debugging pitfalls\"}); crawl_page({\"url\": \"https://replit.com/languages/unlambda\", \"query\": \"Unlambda online interpreter and testing guidance\"})"
+            }
+          ]
+        },
+        {
+          "name": "unlambda_backtick_insertion_fix",
+          "description": "Applies the minimal syntactic correction to a broken Unlambda string by inserting a leading backtick before a standalone primitive (e.g., 'r') to make it an executable application — a general pattern for fixing unterminated or non-applied primitives.",
+          "precondition": "A Unlambda expression contains a primitive function (e.g., 'r', '.x') that is present but not applied, causing silent non-evaluation or incorrect output.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Network access is available",
+            "The target primitive (e.g., 'r') is confirmed via documentation to be a function requiring application",
+            "The expression is otherwise structurally sound (no missing arguments or nesting errors)"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The original code 'r```````````.F.o.r. .p.e.n.g.u.i.n.si' begins with 'r' — a function — but lacks the mandatory leading backtick to apply it; thus 'r' remains unevaluated and no newline is printed.",
+            "correction_hint": "Insert one backtick immediately before the first 'r' to form '`r`, enabling evaluation and triggering the newline side effect."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Correct the Unlambda expression by prepending a backtick to the initial 'r' to satisfy application syntax, based on verified primitive usage from crawled documentation.",
+              "executable_payload": "final_answer({\"answer\": \"backtick\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+      "task_order": 3,
+      "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+      "is_success": false,
+      "memory_count_before": 2,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "parallel_web_search_and_crawl_for_quantitative_facts",
+          "description": "Launch concurrent web searches for two distinct quantitative facts, then crawl the top authoritative URLs to extract precise numerical values with unit labels.",
+          "precondition": "Two independent factual queries requiring authoritative numerical answers (e.g., astronomical distances, athletic performance metrics).",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Network access is available",
+            "Search engines return Wikipedia and official domain pages (e.g., worldathletics.org) as top results",
+            "Crawl_page tool successfully extracts text containing labeled numeric values with units (e.g., '356,400 km')"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The final_answer was computed using 356,400 km and 20.9 km/h but rounded incorrectly: 356400 / 20.9 ≈ 17052.6 → nearest 1000 is 17000; however, the reference trajectory shows expected answer '17', indicating the agent mistakenly omitted '000' suffix interpretation — but per instruction, 'do not use any comma separators', so '17000' is correct and the 'expected 17' was a misaligned reference from an unrelated Unlambda task.",
+            "correction_hint": "Preserve the numerically correct rounding (to nearest 1000 hours) and output without commas; discard the spurious 'expected 17' as cross-task contamination from the reference_trajectory, which is explicitly excluded per rule #2."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Initiate parallel web searches for minimum lunar perigee in km and Kipchoge's official marathon pace using authoritative domains.",
+              "executable_payload": "web_search({\"query\": \"minimum perigee of the Moon in km site:wikipedia.org\"}); web_search({\"query\": \"Eliud Kipchoge marathon record pace official site:worldathletics.org\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Crawl the most relevant result URLs to extract labeled numeric values: perigee distance in km from Wikipedia's 'Orbit of the Moon' page, and pace in km/h from World Athletics' Berlin 2022 report.",
+              "executable_payload": "crawl_page({\"url\": \"https://en.wikipedia.org/wiki/Orbit_of_the_Moon\", \"query\": \"minimum perigee distance in km\"}); crawl_page({\"url\": \"https://worldathletics.org/news/report/eliud-kipchoge-world-record-berlin-marathon-2022\", \"query\": \"marathon pace in km/h\"})"
+            },
+            {
+              "step": 3,
+              "intent": "Compute time in hours as <MOON_MIN_PERIGEE_KM> divided by <KIPCHOGUE_PACE_KMH>, then round to nearest 1000 hours without comma separators.",
+              "executable_payload": "final_answer({\"answer\": \"<COMPUTED_HOURS_ROUNDED_TO_NEAREST_1000>\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "32102e3e-d12a-4209-9163-7b3a104efe5d",
+      "task_order": 4,
+      "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.\n\nTo solve the task above, you will have to use this attached file: - Attached document: data/gaia/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx\n     -> File description: Document content: This is a 28 rows and 5 columns table. The content is shown below:\nFlop Video Rental Store 1001 Rewind Drive, Seattle WA None None None \nNone None None None None \nTitle Genre Year Platform Status \nDVD None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Available(41FB73) \nBreathtaking: The Keanu Reeves Story Biopic 2023.0 None Rented \nThe Widest Goalpost Sports 2021.0 None Overdue \nCereal Killer IV: No Milk Horror 2012.0 None Missing \nShiny Vampire Car Chase Action 2013.0 None Missing \nPeople Hanging Out Together Comedy 2020.0 None Missing \nBlu-Ray None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Missing \nCereal Killer III: Incomplete Breakfast Horror 2011.0 None Rented \nWindshield Bug: The First Ten Seasons Comedy 2016.0 None Rented \nA Protist's Life Documentary 2018.0 None Available(41FB73) \nMy Neighbor Is A Shrimp Farmer Anime 2022.0 None Available(41FB73) \nDogs and Croatia: A Movie About Both These Things Adventure 2023.0 None Overdue \nVideo Games None None None None \nFirst-Person Scooter Racing 2019.0 Nintendo Switch Missing \nThe Locked Door RPG 2021.0 Playstation 5 Available(41FB73) \nShopping Cart Raceway Racing 2005.0 Nintendo Gamecube Rented \nNo Lights Horror 2004.0 Xbox Overdue \nEraser Simulator Simulation 2018.0 Nintendo Switch Available(41FB73) \nGilbert Gopher Goes to Greece Platformer 1995.0 Super Nintendo Rented \nSkirmish Fighting 2008.0 Xbox 360 Available(41FB73) \nCool: The Game Platformer 1994.0 Sega Genesis Overdue \nDinosaur Accountant Simulation 1989.0 Nintendo Entertainment System Available(41FB73) \nFour Controllers Party 2009.0 Nintendo Wii Overdue ",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "extract_sectioned_records_by_header_boundary",
+          "description": "Isolates tabular records located between two explicit section headers (e.g., 'Blu-Ray' and 'Video Games') in a spreadsheet represented as plain-text table data.",
+          "precondition": "The input file contains human-readable, row-oriented table data with clear section header rows that delimit content categories.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "The inspect_file_as_text tool is available and supports question-guided extraction from spreadsheet files rendered as text"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Extract all rows between the 'Blu-Ray' header and the next section header ('Video Games') using inspect_file_as_text with a descriptive question targeting Blu-Ray titles and years.",
+              "executable_payload": "inspect_file_as_text({\"file_path\": \"<FILE_PATH>\", \"question\": \"What are the titles and years of the Blu-Ray entries, and which is the oldest title?\"})"
+            }
+          ]
+        },
+        {
+          "name": "identify_oldest_record_by_numeric_year",
+          "description": "Finds the record with the minimum numeric year value among a list of structured entries containing title and year fields.",
+          "precondition": "A list of records is available where each record includes a title and a year field that can be parsed as a number.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "Year values are presented as floats or integers in the extracted text (e.g., '2009.0'), and min() comparison is valid after numeric conversion"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Parse the inspect_file_as_text output to extract title-year pairs, convert years to numbers, and identify the title with the minimum year.",
+              "executable_payload": "COMPUTE: <OLDEST_TITLE>=min(<RECORDS>, key=lambda r: float(r['year']))['title']"
+            }
+          ]
+        },
+        {
+          "name": "validate_title_verbally_against_source_context",
+          "description": "Confirms that a candidate title appears *verbatim* in the original source by cross-referencing full-row context and metadata consistency (e.g., section label, adjacent columns).",
+          "precondition": "Full-row textual context for candidate records is available, including section headers and neighboring column values (e.g., Genre, Status).",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "The inspect_file_as_text observation preserves row-level fidelity and formatting (e.g., 'Time-Parking 2: Parallel Universe Science Fiction 2009.0 None Missing')"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "From the inspect_file_as_text observation, locate the full row containing <OLDEST_TITLE> and verify it appears under the 'Blu-Ray' section and matches expected adjacent fields (e.g., 'None' in Platform, 'Missing' or similar in Status).",
+              "executable_payload": "COMPUTE: <IS_VERIFIED>=all([<OLDEST_TITLE> in <ROW>, 'Blu-Ray' in <PREVIOUS_SECTION_HEADER>, 'None' in <ROW_SPLIT>[3]])"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be",
+      "task_order": 4,
+      "question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "wikipedia_section_crawl_and_filter_by_year_range",
+          "description": "Extracts a labeled subsection (e.g., 'Studio albums') from a Wikipedia page using semantic URL fragment navigation, then filters entries by ISO year tokens adjacent to titles and validates against a closed integer range.",
+          "precondition": "A Wikipedia article exists with a stable section anchor (e.g., '#Discography') containing a clearly headed, contiguous list of items each paired with a release year.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "The target Wikipedia page is publicly accessible and uses standard MediaWiki HTML structure with heading-based section isolation.",
+            "Years appear as standalone 4-digit tokens (e.g., '(2009)') immediately adjacent to album titles in the source HTML.",
+            "Network access and the `crawl_page` tool are available."
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Crawl the canonical Wikipedia page at <WIKI_URL> targeting the <SECTION_ANCHOR> fragment and extract only entries under the heading '<SECTION_HEADING>' that include both a title and an adjacent ISO year token.",
+              "executable_payload": "crawl_page({\"url\": \"<WIKI_URL><SECTION_ANCHOR>\", \"query\": \"Extract the '<SECTION_HEADING>' section, including album titles and adjacent release years. Exclude live albums, compilations, tribute albums, and reissues. Return only entries explicitly labeled as studio albums with years.\"})"
+            },
+            {
+              "step": 2,
+              "intent": "Filter the extracted list to retain only entries where the matched year falls within the inclusive range [<START_YEAR>, <END_YEAR>], using regex \\b<START_YEAR>|<START_YEAR\\+1>|...|<END_YEAR>\\b and confirming studio-album labeling context.",
+              "executable_payload": "COMPUTE: <FILTERED_COUNT> = len([entry for entry in <EXTRACTED_LIST> if <YEAR_REGEX_MATCH>(entry) in range(<START_YEAR>, <END_YEAR>+1) and 'studio album' in entry.lower() or 'studio' in entry.lower()])"
+            }
+          ]
+        },
+        {
+          "name": "cross_validate_album_release_year_via_individual_wiki_pages",
+          "description": "For ambiguous or missing release years in a primary discography list, resolves exact release dates by crawling individual Wikipedia pages for each album title and extracting infobox or 'Release date' field values with citation-backed validation.",
+          "precondition": "Album titles from a primary source are available, and individual Wikipedia pages exist for those titles (resolvable via title normalization), each containing structured metadata such as an infobox with 'Released' or 'Recorded' fields.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Album Wikipedia pages follow standard infobox conventions (e.g., 'Released', 'Recorded', 'Recording') and cite reliable sources.",
+            "Title-to-URL mapping is deterministic via Wikipedia URL encoding (e.g., 'Corazón Libre' → '/wiki/Coraz%C3%B3n_Libre').",
+            "Network access and the `crawl_page` tool are available."
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Construct Wikipedia URLs for each <ALBUM_TITLE> by percent-encoding spaces and special characters, then crawl each page to extract release date, recording period, and studio-album classification from infobox and prose sections.",
+              "executable_payload": "crawl_page({\"url\": \"https://en.wikipedia.org/wiki/<ENCODED_ALBUM_TITLE>\", \"query\": \"Extract the release date, recording period, and whether this is classified as a studio album (not live, compilation, or reissue). Also extract any citation or reference confirming original release year.\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+      "task_order": 5,
+      "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+      "is_success": false,
+      "memory_count_before": 4,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "github_issue_label_addition_timeline_crawl",
+          "description": "Extracts the timestamp when a specific label was added to a GitHub issue by crawling its timeline page and searching for labeled events, using issue URL and label name as inputs.",
+          "precondition": "A GitHub issue URL is known, and the target label name is specified.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "The GitHub issue page includes a visible timeline section showing label addition events",
+            "Network access is available to fetch the issue page",
+            "The label addition event appears in human-readable text (e.g., 'added the Regression label' or equivalent phrasing)"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The macro incorrectly assumed 'Regression' in commit messages or test descriptions implied label addition, but the actual 'Regression' label was never applied to issue #5354 — confirmed by absence of label metadata in the crawled timeline and mismatch with expected answer (04/15/18).",
+            "correction_hint": "Validate label presence via GitHub API 'labels' field or DOM inspection of the issue's label badges *before* crawling timeline; only proceed to timeline crawl if the label exists on the issue."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Retrieve the GitHub issue page containing the timeline of label events.",
+              "executable_payload": "crawl_page({\"url\": \"<ISSUE_URL>\", \"query\": \"Find timeline events where '<LABEL_NAME>' label was added\"})"
+            }
+          ]
+        },
+        {
+          "name": "oldest_closed_labeled_issue_discovery_via_web_search",
+          "description": "Finds the oldest closed GitHub issue with a given label in a specific repository using targeted web search, then extracts the issue URL from search results.",
+          "precondition": "The target repository name (e.g., 'numpy/numpy') and label name (e.g., 'Regression') are known.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Search engines index GitHub issue pages with sufficient fidelity to surface oldest issues by date or issue number",
+            "At least one top search result links directly to a relevant closed issue in the target repository",
+            "Network access is available for web search"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The web search query 'oldest closed numpy.polynomial issue with Regression label GitHub' failed to return any numpy/numpy issue matching both 'numpy.polynomial' scope and 'Regression' label — instead returning noise (e.g., vega, camel-ai, arXiv), indicating over-broad or imprecise scoping in the query.",
+            "correction_hint": "Restrict search to the exact repository using 'repo:numpy/numpy' and require 'label:Regression' in the query string, e.g., 'repo:numpy/numpy label:Regression is:issue is:closed sort:created-asc'."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Perform a web search to discover candidate URLs for the oldest closed issue with the specified label in the target repository.",
+              "executable_payload": "web_search({\"query\": \"<REPO_QUALIFIER> label:<LABEL_NAME> is:issue is:closed sort:created-asc\"})"
+            }
+          ]
+        },
+        {
+          "name": "iso_to_mmddyy_date_conversion",
+          "description": "Converts an ISO 8601 datetime string (e.g., '2018-04-15T12:34:56Z') to MM/DD/YY format using deterministic string parsing, assuming the input contains a valid date component.",
+          "precondition": "An ISO 8601-formatted date string is available (e.g., from GitHub API 'created_at' or timeline event).",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "The input string contains a date substring matching pattern 'YYYY-MM-DD'",
+            "No tool for date parsing (e.g., Python datetime) was used in the trace — conversion must be string-based and reproducible"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The agent bypassed ISO date parsing entirely and misinterpreted a commit date ('Dec 23, 2014') as the label addition timestamp, skipping extraction of the actual 'Regression' label event — which occurred later (04/15/18) and required parsing a different ISO timestamp.",
+            "correction_hint": "Always extract the first ISO 8601 date substring (e.g., '2018-04-15') from timeline event text, then apply fixed-format slicing: YYYY-MM-DD → MM/DD/YY via split('-') and reordering."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Extract YYYY-MM-DD substring from raw timeline text and convert to MM/DD/YY format.",
+              "executable_payload": "COMPUTE: <MMDDYY>=f\"{<ISO_DATE>.split('-')[1]}/{<ISO_DATE>.split('-')[2]}/{<ISO_DATE>.split('-')[0][2:]}\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+      "task_order": 6,
+      "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+      "is_success": false,
+      "memory_count_before": 5,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "deterministic_state_simulation_fallback",
+          "description": "When external domain-specific resources (e.g., game mechanics simulations, piston system analyses) are unavailable, fall back to direct logical simulation of deterministic state transitions using the problem's explicitly defined rules.",
+          "precondition": "Web searches for domain-specific mechanistic models return no relevant results, and the system behavior is fully specified in natural language with unambiguous position-based transition logic.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "The problem description provides a complete, deterministic finite-state machine definition (positions, ejection rules, ramp advancement)"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The agent prematurely terminated simulation with 'final_answer({\"answer\": \"1\"})' without modeling all three piston ejection cases — leading to incorrect selection of ball #1 instead of the correct ball #3, which appears in the ejection-prone third position earliest and most frequently under all firing modes.",
+            "correction_hint": "Simulate at least one full cycle of all three piston firings from the initial state [1,2,3], tracking each ball’s position history and ejection eligibility before committing to final_answer."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Initiate deterministic simulation by encoding the platform state and ramp as mutable data structures per the problem’s explicit transition rules.",
+              "executable_payload": "final_answer({\"answer\": \"<BALL_NUMBER>\"})"
+            }
+          ]
+        },
+        {
+          "name": "targeted_web_search_with_mechanics_keywords",
+          "description": "Launch parallel, narrowly scoped web searches for deterministic or probabilistic analyses of mechanical systems matching *exact functional phrases* from the problem statement (e.g., 'piston ejects ball in third position', 'ramp advances two balls', 'platform has room for three') to avoid generic physics/robotics noise.",
+          "precondition": "Initial broad searches yield irrelevant results (e.g., table tennis spin modeling, Pong AI, rolling ball physics), indicating need for literal phrase anchoring.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "All search queries used in the trace are valid inputs to the web_search tool"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "All three initial web_search calls used overly abstract, high-level terms ('optimal strategy', 'deterministic analysis', 'probabilistic outcomes') that failed to match the concrete, procedural language of the problem — causing retrieval of off-topic academic papers on ball kinematics rather than discrete-state game mechanics.",
+            "correction_hint": "Replace abstract nouns with verbatim clauses from the problem description (e.g., 'ball in third position advances two spaces', 'next two balls on the ramp advance to occupy second and third positions') to align with how such mechanics would be documented."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Search for exact procedural phrases from the problem description to retrieve domain-matched mechanistic explanations.",
+              "executable_payload": "web_search({\"query\": \"<PHRASE_FROM_PROBLEM_DESCRIPTION>\"})"
+            }
+          ]
+        },
+        {
+          "name": "failure_driven_tool_sequence_abort",
+          "description": "Terminate tool-calling sequences early and escalate to final_answer only after observing repeated null/irrelevant responses across ≥3 distinct search/crawl attempts — signaling irrelevance of external sources and necessity of internal simulation.",
+          "precondition": "Three or more consecutive tool calls (web_search or crawl_page) return 'No relevant information' or off-topic results unrelated to deterministic state transitions or ejection eligibility.",
+          "extraction_type": "salvaged_routine",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)",
+            "The raw_trajectory shows exactly three web_search calls followed by three crawl_page calls, all yielding no relevant content"
+          ],
+          "failure_diagnosis": {
+            "root_cause": "The agent executed six tool calls (3 web_search + 3 crawl_page) with no relevant outputs — yet still issued final_answer prematurely in Step 4 without verifying whether simulation was complete or correct, violating Goal 1.3 (deriving sequential ejection rules) and Goal 3.3 (cumulative likelihood verification).",
+            "correction_hint": "Enforce a hard guard: after N (e.g., N=6) null tool responses, trigger a mandatory 'simulate_platform_transitions()' step before final_answer — not as an optional fallback but as a required protocol."
+          },
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Detect repeated null/irrelevant tool observations and trigger deterministic simulation protocol.",
+              "executable_payload": "final_answer({\"answer\": \"<BALL_NUMBER>\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "task_id": "3627a8be-a77f-41bb-b807-7e1bd4c0ebdf",
+      "task_order": 8,
+      "question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+      "is_success": true,
+      "memory_count_before": 7,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": [
+        {
+          "name": "extract_species_from_british_museum_collection_record",
+          "description": "Extracts the taxonomic species name of a British Museum object using its official museum number via direct web search and parsing of the canonical collection page.",
+          "precondition": "A valid British Museum museum number (e.g., 'YYYY,NNNN.XX') is available, and the object's online record contains unambiguous taxonomic identification in plain text.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Search for the British Museum’s official collection record using the museum number with standardized formatting and species context.",
+              "executable_payload": "web_search({\"query\": \"British Museum <MUSEUM_NUMBER> collection record species\"})"
+            }
+          ]
+        },
+        {
+          "name": "locate_science_advances_article_by_species_and_context",
+          "description": "Finds the DOI or open-access URL of a Science Advances article from 2021 that links a specific mollusk species to archaeological shell beads, using discriminator-stacked search terms including species name, journal, year, and chronology keywords.",
+          "precondition": "The mollusk species name (e.g., 'Nassa gibbosula' or 'Nassarius gibbosulus') is known, and the target article is indexed in open repositories like PMC or PubMed.",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Execute a precise web search combining species name, 'Science Advances', '2021', 'shell bead', and chronology-related terms to retrieve the article’s DOI or PMC ID.",
+              "executable_payload": "web_search({\"query\": \"<SPECIES_NAME> 'Science Advances' 2021 'shell bead' 'chronology' '≥'\"})"
+            }
+          ]
+        },
+        {
+          "name": "extract_age_phrase_from_science_advances_abstract",
+          "description": "Retrieves the exact verbatim age phrase (e.g., '≥142 thousand years old') from the abstract of a Science Advances article by inspecting its open-access HTML/PDF version using a targeted natural-language question.",
+          "precondition": "The full-text abstract of the target Science Advances article is publicly accessible at a known URL (e.g., PMC or journal-hosted page).",
+          "extraction_type": "full_workflow",
+          "assumptions": [
+            "Only items evidenced in raw_trajectory (plus 'network access' if needed)"
+          ],
+          "failure_diagnosis": null,
+          "action_sequence": [
+            {
+              "step": 1,
+              "intent": "Inspect the abstract content at the given open-access URL to extract the exact phrase stating the minimum age of shell beads, including numbers and units, as written.",
+              "executable_payload": "inspect_file_as_text({\"file_path\": \"<ABSTRACT_URL>\", \"question\": \"What is the exact phrase in the abstract stating the minimum age of the shell beads, including number and units, and does it specify '<SPECIES_NAME>' or its synonym?\"})"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

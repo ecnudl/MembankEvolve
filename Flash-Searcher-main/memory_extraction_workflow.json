@@ -1,0 +1,429 @@
+{
+  "experiment": "memory_extraction_test",
+  "prompt_source": "./workflow_prompt.txt",
+  "total_tasks": 10,
+  "successful_extractions": 10,
+  "llm_calls": 10,
+  "skipped_success": 0,
+  "timestamp": "2026-02-25T12:32:09.484263",
+  "model": "qwen-plus",
+  "results": [
+    {
+      "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+      "task_order": 1,
+      "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": false,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Prioritize direct source acquisition for domain-specific quantitative facts",
+            "rationale": "When the task requires a precise, journal-level statistic (e.g., count of research articles in a given year), official publisher sources are highest-fidelity and eliminate inferential error from indexing delays or classification mismatches in third-party databases",
+            "generalized_execution": "Select official publication archive or journal homepage as primary evidence source over bibliographic APIs or aggregators"
+          },
+          {
+            "step": 2,
+            "action": "Decompose the target metric into type-qualified subcomponents",
+            "rationale": "To satisfy the constraint 'articles only, not book reviews/columns', the raw count must be disambiguated by article type labels used by the source — not inferred from metadata fields like 'document_type' in external indexes which may lack granularity or consistency",
+            "generalized_execution": "Extract counts annotated with canonical content-type identifiers (e.g., 'Article', 'Review', 'Comment') directly from the publisher's classification schema"
+          },
+          {
+            "step": 3,
+            "action": "Apply uniform null distribution reasoning only after confirming the count is restricted to testable research claims",
+            "rationale": "The p ≤ 0.04 false positive rate interpretation assumes each counted item represents an independent statistical test under a null hypothesis; non-research items (e.g., editorials) lack such tests and must be excluded before applying Type I error logic",
+            "generalized_execution": "Validate that <COUNT> reflects only items bearing empirical hypotheses and statistical inference, then compute ceiling(<COUNT> × 0.04)"
+          },
+          {
+            "step": 4,
+            "action": "Terminate search upon extraction of a single, self-contained, type-filtered count from a primary source",
+            "rationale": "The problem admits a deterministic solution once the count is known; Bayesian modeling (Goal 3) and cross-validation (Goal 4) are unnecessary because the query explicitly assumes uniform reliance on statistical significance and fixes the p-value threshold — no uncertainty about prior probability or power is required for the stated calculation",
+            "generalized_execution": "Stop after retrieving <COUNT> from <PRIMARY_SOURCE> where <COUNT> is explicitly labeled as research articles and excludes non-research types per source-defined taxonomy"
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "Search for '<JOURNAL_NAME> number of articles published in <YEAR> by article type'",
+            "validation_criteria": "Evidence must report numeric counts explicitly segmented by publisher-defined content categories (e.g., 'Articles', 'Reviews', 'Columns') and identify the count for research articles ('Article' or equivalent) in <YEAR> — not total items, not citations, not volumes/issues"
+          },
+          {
+            "step": 2,
+            "query_formulation": "Crawl the official archive URL for <JOURNAL_NAME> filtered by <YEAR> with instruction to extract type-labeled counts",
+            "validation_criteria": "Page content must contain a machine-extractable, unambiguous statement or structured list assigning a natural number to 'Research Article', 'Article', or semantically equivalent label — excluding any value embedded in prose without explicit type attribution"
+          },
+          {
+            "step": 3,
+            "query_formulation": "Verify exclusion alignment by checking whether reported non-research counts (e.g., 'Book Reviews', 'Career Columns') match the query’s exclusion criteria",
+            "validation_criteria": "The source must enumerate at least one excluded category with a count, confirming the reported research-article count is already filtered — or explicitly state that the research-article count excludes those categories"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "17b5a6a3-bc87-42e8-b0fb-6ab0781ef2cc",
+      "task_order": 1,
+      "question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Resolve taxonomic ambiguity by prioritizing authoritative biological databases over pop-culture references",
+            "rationale": "Species identification must be grounded in taxonomic consensus (e.g., FishBase, WoRMS) to avoid misattribution; cinematic naming is not a valid taxonomic source",
+            "generalized_execution": "Query <AUTHORITATIVE_TAXONOMIC_SOURCES> for morphological, genetic, and nomenclatural distinctions between candidate binomials <SPECIES_A> and <SPECIES_B>"
+          },
+          {
+            "step": 2,
+            "action": "Validate database presence via canonical endpoint targeting before falling back to exploratory navigation",
+            "rationale": "Direct access to the official species profile URL (e.g., FactSheet.aspx?SpeciesID=...) yields structured occurrence data; searching the domain root or generic map viewers introduces noise and delays",
+            "generalized_execution": "Execute site-scoped search for <SPECIES_BINOMIAL> on <CANONICAL_DATABASE_DOMAIN> to retrieve <SPECIES_PROFILE_URL>"
+          },
+          {
+            "step": 3,
+            "action": "Treat absence of direct hits as evidence of naming divergence—not data absence—and pivot to database-native identifiers",
+            "rationale": "A failed binomial search implies the database uses alternate taxonomy (e.g., synonym, common name, or legacy ID); success requires switching from lexical to structural discovery (e.g., Map Viewer → Collections → Specimen ID)",
+            "generalized_execution": "Navigate <DATABASE_MAP_VIEWER_URL> to locate <SPECIES_COLLECTION_PAGE> and extract <SPECIMEN_ID> or <SPECIES_ID> from metadata or tabbed interfaces"
+          },
+          {
+            "step": 4,
+            "action": "Anchor geographic resolution to administrative units explicitly cited in primary occurrence records, then geocode to ZIP code using jurisdictional authority sources",
+            "rationale": "USGS NAS reports occurrences at county-level granularity (e.g., 'Pinellas Co., FL'); ZIP codes are municipal artifacts not stored in scientific databases—so authoritative local government or GIS-verified sources must bridge this semantic gap",
+            "generalized_execution": "Extract <COUNTY>, <STATE>, and <LOCALITY_NAME> from <OCCURRENCE_FACTSHEET>, then query <GOVERNMENT_OR_GIS_AUTHORITY_SOURCES> for ZIP code(s) associated with that administrative and physical location"
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "\"Finding Nemo\" clownfish <SPECIES_A> vs <SPECIES_B> <AUTHORITATIVE_SOURCE_1> <AUTHORITATIVE_SOURCE_2>",
+            "validation_criteria": "Two independent authoritative sources (e.g., FishBase + WoRMS or MarineBio + IUCN) must unambiguously assign the film’s character to one binomial, resolving morphological or nomenclatural confusion"
+          },
+          {
+            "step": 2,
+            "query_formulation": "\"<CANONICAL_DATABASE_NAME>\" \"<SPECIES_BINOMIAL>\" site:<DATABASE_DOMAIN>",
+            "validation_criteria": "Return of a live, canonical species profile URL (e.g., containing '/FactSheet.aspx?SpeciesID=') with nonempty 'Nonindigenous Occurrences' section"
+          },
+          {
+            "step": 3,
+            "query_formulation": "\"<DATABASE_NAME>\" \"Map Viewer\" \"Collections\" OR \"Specimen Records\" site:<DATABASE_DOMAIN>",
+            "validation_criteria": "Retrieval of a functional interface URL containing tabbed navigation to 'Collections' or 'Specimen Records', with visible specimen count or point-map functionality"
+          },
+          {
+            "step": 4,
+            "query_formulation": "\"<LOCALITY_NAME>\" \"<COUNTY_NAME>\" \"<STATE_ABBR>\" zip code",
+            "validation_criteria": "At least two corroborating sources (e.g., county government website + GIS-verified real estate or infrastructure database) must list identical five-digit ZIP code(s) for the exact locality and administrative unit"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "c61d22de-5f6c-4958-a7f6-5e9707bd3466",
+      "task_order": 1,
+      "question": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": false,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Initiate parallel search for two temporally anchored, domain-specific arXiv papers",
+            "rationale": "The task hinges on cross-referencing two precisely dated publications from distinct subfields (AI governance and Physics & Society); parallel initiation avoids sequential latency and exploits independent retrieval paths",
+            "generalized_execution": "Launch concurrent web searches for <PAPER_1_QUERY> (targeting <DOMAIN_1>, <DATE_RANGE_1>, <STRUCTURAL_FEATURE>) and <PAPER_2_QUERY> (targeting <DOMAIN_2>, <EXACT_DATE>, <CONCEPTUAL_KEYWORD>)"
+          },
+          {
+            "step": 2,
+            "action": "Validate candidate papers using submission date and structural/semantic fidelity",
+            "rationale": "Success requires strict temporal compliance (June 2022 / August 11, 2016) and functional alignment (three-axis figure / society-type descriptor); metadata and abstract-level verification prevents downstream drift",
+            "generalized_execution": "For each candidate, confirm <SUBMISSION_DATE> via source metadata and verify presence of <REQUIRED_STRUCTURE> or <REQUIRED_CONCEPT> in abstract or title"
+          },
+          {
+            "step": 3,
+            "action": "Extract axis-end labels exclusively from the figure’s explicit textual anchors",
+            "rationale": "Axis labels must be unambiguously grounded in the paper’s own nomenclature—not inferred or paraphrased—to ensure lexical fidelity for cross-paper matching",
+            "generalized_execution": "Use text extraction on <PAPER_1_PDF_URL> to locate <FIGURE_CAPTION_OR_SECTION> and extract only terms appearing verbatim as endpoint labels in <FIGURE_DESCRIPTION_CONTEXT>"
+          },
+          {
+            "step": 4,
+            "action": "Cross-validate societal descriptors against syntactic co-occurrence patterns in the second paper",
+            "rationale": "A word qualifies as a 'type of society' only if it functions attributively with 'society' (e.g., 'egalitarian society') or appears in a canonical societal taxonomy—lexical presence alone is insufficient",
+            "generalized_execution": "Inspect <PAPER_2_PDF_URL> for exact phrase matches of <CANDIDATE_WORD> + 'society' or membership in a labeled societal classification schema"
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "arXiv <DOMAIN_1> <DATE_RANGE_1> (<STRUCTURAL_SYNONYM_1> OR <STRUCTURAL_SYNONYM_2> OR <STRUCTURAL_SYNONYM_3>)",
+            "validation_criteria": "Result must contain an arXiv ID, submission date within <DATE_RANGE_1>, and explicit mention of 'three-axis', 'triangular', or '3D' in context of a regulatory/governance model"
+          },
+          {
+            "step": 2,
+            "query_formulation": "arXiv <DOMAIN_2> <EXACT_DATE> (<SOCIETAL_KEYWORD_1> OR <SOCIETAL_KEYWORD_2> OR <SOCIETAL_KEYWORD_3>)",
+            "validation_criteria": "Result must contain an arXiv ID, submission date matching <EXACT_DATE> exactly, category 'physics.soc-ph', and use of at least one <SOCIETAL_KEYWORD> as a noun modifier in phrases like '<SOCIETAL_KEYWORD> society'"
+          },
+          {
+            "step": 3,
+            "query_formulation": "<PAPER_1_PDF_URL> text extraction targeting <FIGURE_LABEL_PATTERN>",
+            "validation_criteria": "Output must list six distinct, capitalized words, grouped in three ordered pairs, each pair explicitly tied to one axis in <FIGURE_CAPTION_OR_SUMMARY_TEXT>"
+          },
+          {
+            "step": 4,
+            "query_formulation": "<PAPER_2_PDF_URL> text extraction targeting <SOCIETAL_PHRASE_PATTERN>",
+            "validation_criteria": "Output must contain at least one verbatim instance of '<CANDIDATE_WORD> society' or '<CANDIDATE_WORD> social system' where <CANDIDATE_WORD> is drawn from the six extracted axis-end labels"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+      "task_order": 2,
+      "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+      "is_success": false,
+      "memory_count_before": 1,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": null,
+        "search_workflow": null,
+        "skipped": true,
+        "skipped_reason": "is_success is false; orchestration extraction is success-only."
+      }
+    },
+    {
+      "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+      "task_order": 3,
+      "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+      "is_success": false,
+      "memory_count_before": 2,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": null,
+        "search_workflow": null,
+        "skipped": true,
+        "skipped_reason": "is_success is false; orchestration extraction is success-only."
+      }
+    },
+    {
+      "task_id": "32102e3e-d12a-4209-9163-7b3a104efe5d",
+      "task_order": 4,
+      "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.\n\nTo solve the task above, you will have to use this attached file: - Attached document: data/gaia/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx\n     -> File description: Document content: This is a 28 rows and 5 columns table. The content is shown below:\nFlop Video Rental Store 1001 Rewind Drive, Seattle WA None None None \nNone None None None None \nTitle Genre Year Platform Status \nDVD None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Available(41FB73) \nBreathtaking: The Keanu Reeves Story Biopic 2023.0 None Rented \nThe Widest Goalpost Sports 2021.0 None Overdue \nCereal Killer IV: No Milk Horror 2012.0 None Missing \nShiny Vampire Car Chase Action 2013.0 None Missing \nPeople Hanging Out Together Comedy 2020.0 None Missing \nBlu-Ray None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Missing \nCereal Killer III: Incomplete Breakfast Horror 2011.0 None Rented \nWindshield Bug: The First Ten Seasons Comedy 2016.0 None Rented \nA Protist's Life Documentary 2018.0 None Available(41FB73) \nMy Neighbor Is A Shrimp Farmer Anime 2022.0 None Available(41FB73) \nDogs and Croatia: A Movie About Both These Things Adventure 2023.0 None Overdue \nVideo Games None None None None \nFirst-Person Scooter Racing 2019.0 Nintendo Switch Missing \nThe Locked Door RPG 2021.0 Playstation 5 Available(41FB73) \nShopping Cart Raceway Racing 2005.0 Nintendo Gamecube Rented \nNo Lights Horror 2004.0 Xbox Overdue \nEraser Simulator Simulation 2018.0 Nintendo Switch Available(41FB73) \nGilbert Gopher Goes to Greece Platformer 1995.0 Super Nintendo Rented \nSkirmish Fighting 2008.0 Xbox 360 Available(41FB73) \nCool: The Game Platformer 1994.0 Sega Genesis Overdue \nDinosaur Accountant Simulation 1989.0 Nintendo Entertainment System Available(41FB73) \nFour Controllers Party 2009.0 Nintendo Wii Overdue ",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Identify section boundaries by scanning for canonical format headers",
+            "rationale": "The data is structured into categorical sections (e.g., 'DVD', 'Blu-Ray', 'Video Games') with inconsistent row padding; header detection enables precise scope isolation without relying on column alignment or fixed offsets.",
+            "generalized_execution": "Locate the first occurrence of <SECTION_HEADER> and the next subsequent header <NEXT_SECTION_HEADER>, then extract all rows strictly between them."
+          },
+          {
+            "step": 2,
+            "action": "Filter rows belonging exclusively to the target medium using contextual section membership",
+            "rationale": "Entries are not tagged per-row with medium type; instead, medium identity is inherited from the nearest preceding section header — so row inclusion must be validated against positional containment within the <SECTION_HEADER> boundary, not keyword presence in the row itself.",
+            "generalized_execution": "Retain only rows that fall within the index range defined by <SECTION_HEADER_START> and <NEXT_SECTION_HEADER_START>, discarding any rows matching <EXCLUDED_HEADERS> or empty structural rows."
+          },
+          {
+            "step": 3,
+            "action": "Extract title-year pairs while preserving original string fidelity",
+            "rationale": "The task requires returning the title *as appearing in the spreadsheet*; therefore, raw text extraction must avoid normalization (e.g., trimming, case conversion, or regex cleaning) and retain all whitespace, punctuation, and bracketed status annotations exactly as observed.",
+            "generalized_execution": "For each retained row, parse the <TITLE_COLUMN_INDEX> and <YEAR_COLUMN_INDEX> fields as unmodified strings, then pair them without transformation."
+          },
+          {
+            "step": 4,
+            "action": "Resolve chronological order via numeric year comparison with robust type fallback",
+            "rationale": "Year values are embedded as floats (e.g., 2009.0) but may contain missing or non-numeric entries; successful ordering requires casting to numeric type with explicit null/invalid handling, not lexical sorting or positional assumptions.",
+            "generalized_execution": "Convert each <YEAR_FIELD> to a number, treating non-convertible values as invalid and excluding them; then identify the row with the minimum valid numeric value."
+          },
+          {
+            "step": 5,
+            "action": "Validate final title against original row context to confirm verbatim fidelity",
+            "rationale": "To satisfy the 'as appearing in the spreadsheet' requirement, the selected title must be confirmed against the full unaltered row — ensuring no truncation, interpolation, or inference has altered its surface form (e.g., status suffixes like '(41FB73)' are excluded from title but must not corrupt title extraction).",
+            "generalized_execution": "Cross-reference the candidate title string against the exact substring at <TITLE_COLUMN_INDEX> in its originating row from the <RAW_SECTION_DATA> to verify character-for-character match."
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "What are the titles and years of the <MEDIA_TYPE> entries, and which is the oldest title?",
+            "validation_criteria": "Evidence must list at least one <MEDIA_TYPE> title with a numeric year, explicitly identify a single oldest title, and present the title string matching the original spreadsheet's exact casing, spacing, and punctuation — with no paraphrasing or summarization."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be",
+      "task_order": 4,
+      "question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Initiate parallel acquisition of primary authoritative source and corroborating external sources",
+            "rationale": "Maximize signal-to-noise ratio by anchoring in a canonical, structured source (Wikipedia discography section) while simultaneously probing independent domain-specific repositories to detect omissions or ambiguities early",
+            "generalized_execution": "Execute crawl_page on the canonical <ENTITY_PAGE_URL>#<SECTION_ANCHOR> for labeled studio albums, and concurrently issue web_search queries against <DOMAIN_SPECIFIC_SITE_1> and <DOMAIN_SPECIFIC_SITE_2> using temporally bounded, entity-qualified terms"
+          },
+          {
+            "step": 2,
+            "action": "Validate structural integrity and semantic labeling of the primary list before filtering",
+            "rationale": "Prevent cascading errors by confirming that the extracted 'Studio albums' section contains only entries explicitly designated as studio albums (no live/compilation/tribute qualifiers) and that year tokens are adjacent and unambiguous — this ensures temporal filtering operates on clean, semantically grounded data",
+            "generalized_execution": "Inspect the crawled <SECTION_CONTENT> for presence of a dedicated heading matching '<STUDIO_ALBUMS_HEADING>' and verify each entry satisfies both syntactic (year token proximity) and semantic (absence of disqualifying labels) constraints"
+          },
+          {
+            "step": 3,
+            "action": "Apply strict temporal filtering using lexical year extraction with inclusive bounds validation",
+            "rationale": "Enforce exact range compliance by extracting only years that match the regex pattern for <START_YEAR>–<END_YEAR> and appear in immediate textual proximity to album titles — rejecting entries with inferred, cited, or reissue years unless explicitly stated as original release",
+            "generalized_execution": "For each album in the validated list, apply <YEAR_EXTRACTION_REGEX> to surrounding text; retain only those where the matched year falls within [<START_YEAR>, <END_YEAR>] and is not modified by qualifiers like 'reissue', 'remastered', or 're-recorded'"
+          },
+          {
+            "step": 4,
+            "action": "Resolve ambiguous or missing temporal evidence via targeted deep-crawling of individual album pages",
+            "rationale": "Break ambiguity deadlock by treating each borderline or unverified album as an independent verification unit — prioritize infobox-derived release dates over prose, and require citation-backed confirmation when prose contradicts structured metadata",
+            "generalized_execution": "For any album lacking a verifiable <YEAR_TOKEN> in the primary list, construct <ALBUM_PAGE_URL> from title and crawl its infobox and 'Release date' section, validating against <CITATION_REQUIRED> or label-attested original release year"
+          },
+          {
+            "step": 5,
+            "action": "Terminate with final count only after cross-source convergence or decisive primary-source sufficiency",
+            "rationale": "Avoid over-reliance on noisy secondary sources; accept the primary authoritative source as definitive if it yields a self-consistent, structurally validated, temporally filtered set — escalate to external sources only when primary data is incomplete or internally contradictory",
+            "generalized_execution": "If the validated and filtered <PRIMARY_ALBUM_LIST> yields a non-empty, unambiguous subset within [<START_YEAR>, <END_YEAR>], output count; otherwise, reconcile with <EXTERNAL_SOURCE_DATA> only where primary source lacks coverage or contains explicit contradictions"
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "\"<ENTITY_NAME>\" \"studio album\" (<START_YEAR> OR <START_YEAR>+1 OR ... OR <END_YEAR>) site:en.wikipedia.org",
+            "validation_criteria": "Result must link to a Wikipedia page containing a machine-separable 'Studio albums' subsection with unambiguous year-adjacent titles and no disqualifying labels (live/compilation/tribute/reissue)"
+          },
+          {
+            "step": 2,
+            "query_formulation": "\"<ENTITY_NAME>\" \"<ALBUM_TITLE>\" \"<YEAR>\" site:<DOMAIN_SPECIFIC_SITE>",
+            "validation_criteria": "Result must display official release year in structured metadata (e.g., Discogs 'Released' field or AllMusic 'Recorded/Released') and confirm studio-album classification via genre tag, format field, or absence of 'Live', 'Compilation', or 'Reissue' indicators"
+          },
+          {
+            "step": 3,
+            "query_formulation": "\"<ENTITY_NAME>\" \"<ALBUM_TITLE>\" \"official <LABEL_NAME>\" OR \"Sony Music\" OR \"Universal Music\"",
+            "validation_criteria": "Result must originate from an official label domain or press release citing original release date and studio-album status — third-party resellers or fan wikis are excluded unless they directly cite official label documentation"
+          },
+          {
+            "step": 4,
+            "query_formulation": "\"<ENTITY_NAME>\" \"discography\" intitle:\"Discography\" site:en.wikipedia.org",
+            "validation_criteria": "Result must resolve to a Wikipedia page with a stable, sectioned discography table or list where 'Studio albums' is a top-level heading and contains at least one entry with year in [<START_YEAR>, <END_YEAR>]"
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+      "task_order": 5,
+      "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+      "is_success": false,
+      "memory_count_before": 4,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": null,
+        "search_workflow": null,
+        "skipped": true,
+        "skipped_reason": "is_success is false; orchestration extraction is success-only."
+      }
+    },
+    {
+      "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+      "task_order": 6,
+      "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+      "is_success": false,
+      "memory_count_before": 5,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": null,
+        "search_workflow": null,
+        "skipped": true,
+        "skipped_reason": "is_success is false; orchestration extraction is success-only."
+      }
+    },
+    {
+      "task_id": "3627a8be-a77f-41bb-b807-7e1bd4c0ebdf",
+      "task_order": 8,
+      "question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+      "is_success": true,
+      "memory_count_before": 7,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "agent_workflow": [
+          {
+            "step": 1,
+            "action": "Initiate parallel goal pursuit with strict decoupling of identification, retrieval, and extraction tasks",
+            "rationale": "Prevents cascading failure by isolating species identification (Goal 1) from article retrieval (Goal 2) and numeric extraction (Goal 3); enables early termination of resolved goals without blocking others",
+            "generalized_execution": "Launch <TOOL_SEARCH> for <GOAL_1_QUERY> and <GOAL_2_DISCRIMINATOR_QUERY> simultaneously, while deferring <GOAL_3_INSPECTION> until abstract availability is confirmed"
+          },
+          {
+            "step": 2,
+            "action": "Validate taxonomic identification against authoritative institutional source before proceeding to downstream goals",
+            "rationale": "Ensures downstream searches are grounded in verified nomenclature—prevents semantic drift from synonyms or misspellings (e.g., 'Nassa gibbosula' vs. 'Nassarius gibbosulus')",
+            "generalized_execution": "Accept only evidence where <AUTHORITATIVE_SOURCE> (e.g., museum collection API or official record page) explicitly states the species name in a canonical taxonomic field, rejecting third-party summaries or metadata-only references"
+          },
+          {
+            "step": 3,
+            "action": "Escalate search discriminators upon initial retrieval failure using lexical anchors from validated taxonomy",
+            "rationale": "When direct museum-number–journal queries yield meta-references instead of primary content, pivoting to biologically grounded terms ('<SPECIES_NAME>', '<SITE_NAME>', '<CHRONOLOGY_TERM>') increases precision by aligning with how researchers index and cite findings",
+            "generalized_execution": "Replace <MUSEUM_NUMBER> with <SPECIES_NAME> and add domain-specific contextual terms (<SITE_NAME>, <CHRONOLOGY_TERM>, <DOI_PATTERN>) to form a new <DISCRIMINATOR_STACKED_QUERY>"
+          },
+          {
+            "step": 4,
+            "action": "Confirm abstract provenance by cross-verifying DOI, journal metadata, and open-access version equivalence",
+            "rationale": "Guarantees lexical fidelity for final extraction—only the original published abstract (not press releases, PMC reformatting, or editorial summaries) satisfies the requirement for verbatim age phrasing",
+            "generalized_execution": "Validate that <DOI> resolves to <JOURNAL_OFFICIAL_PAGE>, and that <OPEN_ACCESS_VERSION> contains identical abstract text as <JOURNAL_OFFICIAL_PAGE> via structural and lexical alignment check"
+          },
+          {
+            "step": 5,
+            "action": "Terminate workflow upon exact-match lexical extraction satisfying unit and quantifier constraints",
+            "rationale": "Enforces strict adherence to the task’s output specification: no inference, rounding, or unit conversion—only the unmodified phrase containing 'at least', a numeral, and 'thousand years old' (or equivalent canonical unit like 'ka')",
+            "generalized_execution": "Return only the substring matching <LEXICAL_PATTERN> (e.g., 'at least <NUMBER> thousand years old' or '≥<NUMBER> ka') as extracted verbatim from the validated abstract; reject all paraphrased, summarized, or contextually inferred values"
+          }
+        ],
+        "search_workflow": [
+          {
+            "step": 1,
+            "query_formulation": "British Museum <MUSEUM_NUMBER> collection record species",
+            "validation_criteria": "Evidence must originate from the official museum domain (<MUSEUM_DOMAIN>) and contain an unambiguous, non-conditional taxonomic assertion in a labeled field (e.g., 'Description:', 'Species:')"
+          },
+          {
+            "step": 2,
+            "query_formulation": "\"<MUSEUM_NUMBER>\" \"Science Advances\" <YEAR> \"shell bead\" <CHRONOLOGY_TERM>",
+            "validation_criteria": "Results must link directly to a peer-reviewed article (not benchmarks, datasets, or news aggregators) and include either a resolvable DOI or a PDF URL from a trusted repository (e.g., PMC, Science.org)"
+          },
+          {
+            "step": 3,
+            "query_formulation": "<SPECIES_NAME> \"Science Advances\" <YEAR> \"shell bead\" <SITE_NAME> <CHRONOLOGY_TERM>",
+            "validation_criteria": "At least one result must cite the same <DOI> across ≥2 independent academic sources (e.g., PMC + ResearchGate + journal homepage), confirming consensus on provenance and chronology"
+          },
+          {
+            "step": 4,
+            "query_formulation": "Science Advances <DOI> official journal page",
+            "validation_criteria": "The retrieved page must display the canonical journal header, volume/issue metadata matching <YEAR> and <JOURNAL_NAME>, and an abstract section with identical wording to the open-access version"
+          },
+          {
+            "step": 5,
+            "query_formulation": "<SPECIES_NAME> <LEXICAL_PATTERN> \"Science Advances\" <YEAR>",
+            "validation_criteria": "Top result must contain the exact phrase matching <LEXICAL_PATTERN> in its abstract text—with no intervening modifiers—and attribute it to the target article via inline citation or metadata"
+          }
+        ]
+      }
+    }
+  ]
+}

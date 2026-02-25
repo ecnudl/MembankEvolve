@@ -1,0 +1,306 @@
+{
+  "experiment": "memory_extraction_test",
+  "prompt_source": "./tips_prompt.txt",
+  "total_tasks": 10,
+  "successful_extractions": 10,
+  "llm_calls": 10,
+  "skipped_success": 0,
+  "timestamp": "2026-02-25T12:03:48.863936",
+  "model": "qwen-plus",
+  "results": [
+    {
+      "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+      "task_order": 1,
+      "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": false,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Goal-anchored decomposition",
+            "principle": "Decompose the problem into mutually exclusive, sequentially resolvable subgoals where each subgoal’s success criterion is empirically verifiable before proceeding, because it prevents cascading ambiguity when downstream steps depend on upstream numeric inputs.",
+            "micro_example": "First isolating the exact count of Nature research articles (1002) before modeling false positives ensured the p-value threshold could be applied to a validated denominator.",
+            "counterfactual": "Without verified subgoal completion, calculations become speculative and compound uncertainty across layers."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Intent-aligned page crawling",
+            "principle": "When crawling a page, constrain the query to extract only the *semantic category* explicitly requested in the task—not related metadata—because tool-based extraction fails when instructions conflate structural navigation with content classification.",
+            "micro_example": "Asking the crawler to 'identify the total number of research articles... excluding book reviews or columns' directly yielded 1002, bypassing volume counts or citation metrics.",
+            "counterfactual": "Overly broad or structurally oriented queries return noisy, unstructured text that obscures the target value."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "17b5a6a3-bc87-42e8-b0fb-6ab0781ef2cc",
+      "task_order": 1,
+      "question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Ambiguity-first decomposition",
+            "principle": "Decompose the task into orthogonal subgoals ordered by increasing dependency on prior resolution, beginning with disambiguating core referents (e.g., species identity), because unresolved ambiguity propagates error across all downstream steps and invalidates subsequent tool use.",
+            "micro_example": "First confirming *Amphiprion ocellaris*—not *A. percula*—as the Finding Nemo species prevented wasted searches against the wrong binomial in USGS NAS.",
+            "counterfactual": "Searching for occurrence data before resolving taxonomic identity leads to zero-result queries and premature abandonment of valid pathways."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Evidence-layered querying",
+            "principle": "Frame search queries to explicitly demand evidence types (e.g., 'peer-recognized', 'timestamped prior to 2023', 'direct quotation') rather than just entities, because authoritative sources often embed critical distinctions only in contextual metadata—not surface terms.",
+            "micro_example": "Searching for 'FishBase + WoRMS consensus'—not just 'Finding Nemo fish name'—yielded unambiguous taxonomic resolution where generic searches would not.",
+            "counterfactual": "Queries targeting only entity names miss qualifying context, causing conflation of similar but non-equivalent concepts across domains."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "c61d22de-5f6c-4958-a7f6-5e9707bd3466",
+      "task_order": 1,
+      "question": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
+      "is_success": true,
+      "memory_count_before": 0,
+      "has_memory_guidance": false,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Parallel Goal Validation",
+            "principle": "Simultaneously launch minimally sufficient probes for all top-level goals, because early cross-goal consistency checks (e.g., shared terms across papers) reveal hidden constraints before deep investment in sequential execution.",
+            "micro_example": "Running searches for both the 2022 AI regulation paper and the 2016 Physics and Society paper in Step 1 revealed 'egalitarian' appeared in both—enabling immediate convergence without waiting for full axis-label extraction.",
+            "counterfactual": "Sequential goal pursuit delays discovery of overlapping lexical anchors, leading to redundant work or late-breaking incompatibility."
+          },
+          {
+            "topic": "Ambiguity-Driven Decomposition",
+            "principle": "When a query contains multiple unresolved referents, decompose by binding each to its most constraining anchor first (e.g., date + domain + format), because anchoring one variable sharply reduces the combinatorial search space for others.",
+            "micro_example": "Fixing 'August 11, 2016' and 'Physics and Society' before interpreting 'type of society' narrowed the candidate paper to one arXiv ID, avoiding fruitless semantic analysis of unlabeled axes.",
+            "counterfactual": "Attempting to resolve ambiguous terms (e.g., 'type of society') before grounding the source document leads to speculative labeling and false positives."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Label-First PDF Inspection",
+            "principle": "When extracting labeled visual elements from a PDF, query the text inspector for exact axis-end phrases *before* using image inspection, because figure captions and schematic summaries often embed endpoint labels verbatim in surrounding text—even when labels are occluded or low-resolution in the image.",
+            "micro_example": "Inspecting the 2022 paper’s PDF text directly returned 'Standardized' and 'Localized' from Section 7’s caption—bypassing the need for error-prone OCR of Figure 1’s diagram.",
+            "counterfactual": "Defaulting to image inspection for labeled diagrams wastes time on rendering artifacts and fails when axis termini are described textually but not legible visually."
+          },
+          {
+            "topic": "Authority-Weighted Term Harvesting",
+            "principle": "Prioritize lexical matches that appear in both a structural context (e.g., 'egalitarian society') and a comparative framework (e.g., 'vs hierarchical'), because co-occurrence in syntactically marked societal typologies signals intentional conceptual use—not incidental mention.",
+            "micro_example": "'Egalitarian' was selected over 'localized' because it appeared as 'egalitarian society' in the 2016 paper’s title and abstract, while 'localized' only occurred in technical governance contexts without societal framing.",
+            "counterfactual": "Selecting any shared term without verifying its role in a recognized typological contrast yields superficial matches that lack conceptual validity."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+      "task_order": 2,
+      "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+      "is_success": false,
+      "memory_count_before": 1,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Failure-mode anchoring",
+            "principle": "Before interpreting observed behavior as evidence of missing content, first verify whether the failure arises from misattributing a syntactic operator’s role to a semantic one, because syntactic primitives often masquerade as data or output when they are actually control constructs.",
+            "micro_example": "The agent assumed 'r' needed completion with 'newline' (a semantic value), but 'r' is already the newline-printing primitive—what was missing was the syntactic backtick to apply it.",
+            "counterfactual": "Interpretation locks onto surface meaning, causing insertion of semantically plausible but syntactically invalid tokens."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Primitive-role disambiguation",
+            "principle": "When consulting documentation for symbolic languages, explicitly separate queries for 'syntax rules' from those for 'primitive behaviors', because conflating operator notation with operator semantics leads to misidentification of missing elements.",
+            "micro_example": "Searching for 'Unlambda r function' returned its behavior (.\\n), but the bug was syntactic: missing backticks for application—not missing a character to append to 'r'.",
+            "counterfactual": "Documentation is scanned for semantic intent, overlooking that the error resides in expression structure, not symbol definition."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+      "task_order": 3,
+      "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+      "is_success": false,
+      "memory_count_before": 2,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Goal-Unit Alignment",
+            "principle": "Before computing any derived quantity, explicitly verify unit compatibility between all inputs and the target output dimension, because mismatched units cause silent magnitude errors that survive validation if rounding or scaling is applied late.",
+            "micro_example": "The agent divided lunar distance in km by pace in km/h but then rounded to nearest thousand hours—ignoring that the raw quotient was ~17,000 hours, not 17—so rounding obscured a factor-of-1000 error.",
+            "counterfactual": "Numerical results appear plausible despite being off by orders of magnitude, leading to false confidence in intermediate values."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Source-Specific Extraction Scope",
+            "principle": "When crawling a page for a precise numeric value, constrain the query to extract *only* the canonical, labeled instance (e.g., 'minimum perigee') and reject ranges or averages unless explicitly requested, because loosely matched context leads to substitution of proxy values that violate task constraints.",
+            "micro_example": "The crawler returned '356,400 km to 370,400 km' as the perigee range, but the agent used the lower bound without confirming it was the *minimum ever recorded*, violating the 'closest approach' requirement.",
+            "counterfactual": "Proxy values (e.g., bounds, averages, or typicals) are mistaken for task-specified extremes, causing systematic under/over-estimation."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "32102e3e-d12a-4209-9163-7b3a104efe5d",
+      "task_order": 4,
+      "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.\n\nTo solve the task above, you will have to use this attached file: - Attached document: data/gaia/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx\n     -> File description: Document content: This is a 28 rows and 5 columns table. The content is shown below:\nFlop Video Rental Store 1001 Rewind Drive, Seattle WA None None None \nNone None None None None \nTitle Genre Year Platform Status \nDVD None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Available(41FB73) \nBreathtaking: The Keanu Reeves Story Biopic 2023.0 None Rented \nThe Widest Goalpost Sports 2021.0 None Overdue \nCereal Killer IV: No Milk Horror 2012.0 None Missing \nShiny Vampire Car Chase Action 2013.0 None Missing \nPeople Hanging Out Together Comedy 2020.0 None Missing \nBlu-Ray None None None None \nTime-Parking 2: Parallel Universe Science Fiction 2009.0 None Missing \nCereal Killer III: Incomplete Breakfast Horror 2011.0 None Rented \nWindshield Bug: The First Ten Seasons Comedy 2016.0 None Rented \nA Protist's Life Documentary 2018.0 None Available(41FB73) \nMy Neighbor Is A Shrimp Farmer Anime 2022.0 None Available(41FB73) \nDogs and Croatia: A Movie About Both These Things Adventure 2023.0 None Overdue \nVideo Games None None None None \nFirst-Person Scooter Racing 2019.0 Nintendo Switch Missing \nThe Locked Door RPG 2021.0 Playstation 5 Available(41FB73) \nShopping Cart Raceway Racing 2005.0 Nintendo Gamecube Rented \nNo Lights Horror 2004.0 Xbox Overdue \nEraser Simulator Simulation 2018.0 Nintendo Switch Available(41FB73) \nGilbert Gopher Goes to Greece Platformer 1995.0 Super Nintendo Rented \nSkirmish Fighting 2008.0 Xbox 360 Available(41FB73) \nCool: The Game Platformer 1994.0 Sega Genesis Overdue \nDinosaur Accountant Simulation 1989.0 Nintendo Entertainment System Available(41FB73) \nFour Controllers Party 2009.0 Nintendo Wii Overdue ",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Section boundary anchoring",
+            "principle": "Anchor analysis to explicit structural markers (e.g., section headers) rather than content keywords, because it prevents category bleed when formats reuse similar terms across disjoint domains.",
+            "micro_example": "Used 'Blu-Ray' and 'Video Games' as hard delimiters—not 'Blu-Ray' in cell values—to isolate only the intended media section.",
+            "counterfactual": "Without anchoring, rows from DVD or Video Games sections could be misclassified as Blu-Ray due to shared title or genre terms."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Output-constrained querying",
+            "principle": "Frame tool queries to request *only* the minimal structured output needed for the final decision, because over-requesting unstructured detail invites noise, misalignment, and premature interpretation.",
+            "micro_example": "Asked 'What are the titles and years of the Blu-Ray entries, and which is the oldest title?'—not general file inspection—so the tool returned a clean, directly comparable list.",
+            "counterfactual": "Broad queries like 'inspect entire file' yield verbose, context-entangled text that obscures target patterns and increases validation overhead."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be",
+      "task_order": 4,
+      "question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+      "is_success": true,
+      "memory_count_before": 3,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Parallel validation paths",
+            "principle": "Advance multiple independent evidence streams concurrently—even when one appears sufficient—because convergent validation from structurally distinct sources (e.g., canonical page vs. domain-specific databases) exposes silent failures in any single extraction logic.",
+            "micro_example": "Ran Wikipedia discography crawl alongside Discogs and AllMusic searches in Step 1, revealing Wikipedia’s incomplete year attribution before filtering.",
+            "counterfactual": "Over-reliance on one source leads to undetected omissions or misclassifications that no single check catches."
+          },
+          {
+            "topic": "Label-driven inclusion",
+            "principle": "Anchor inclusion criteria to explicit semantic labels (e.g., 'studio album') rather than inferred properties, because surface-level features like title phrasing or adjacent dates are unreliable proxies for categorical membership.",
+            "micro_example": "Excluded *Homenaje a Violeta Parra* despite its studio recording status, strictly because it was labeled a 'tribute album'—matching the query’s exclusion rule.",
+            "counterfactual": "Using heuristic proxies instead of declared labels causes category contamination, especially with hybrid works like tribute or collaborative studio albums."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Section-anchored crawling",
+            "principle": "Target tool queries to HTML section identifiers (e.g., '#Discography') and demand structural context (e.g., heading hierarchy), because raw text extraction without positional anchoring conflates semantically distinct content blocks.",
+            "micro_example": "Crawled 'https://en.wikipedia.org/wiki/Mercedes_Sosa#Discography' with explicit instruction to extract only the '### Studio albums' subsection—ensuring live/compilation entries were excluded by location, not just keywords.",
+            "counterfactual": "Extracting from unanchored page dumps introduces noise from unrelated sections, forcing error-prone post-hoc filtering."
+          },
+          {
+            "topic": "Year proximity constraint",
+            "principle": "Require years to appear lexically adjacent to album titles—not just anywhere in the document—because distant date mentions (e.g., copyright lines, reissue notes) create false positives in temporal filtering.",
+            "micro_example": "Retained *Corazón Libre* (2005) only because '(2005)' appeared directly after the title in the Wikipedia list—not from a later infobox or reference footnote.",
+            "counterfactual": "Accepting non-adjacent years causes misattribution of reissue, remaster, or copyright dates as original release years."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+      "task_order": 5,
+      "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+      "is_success": false,
+      "memory_count_before": 4,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Goal-Event Alignment",
+            "principle": "Before executing any tool call, explicitly map each subgoal to the precise event or metadata field it requires—not just the issue’s existence, but the specific timestamped action (e.g., label addition, not creation or test commit).",
+            "micro_example": "The task asked when 'Regression' was *added*, but the agent conflated test commits on Dec 23, 2014 with label application—missing that labels are added via GitHub timeline events, not code commits.",
+            "counterfactual": "Subgoals drift into proxy evidence (e.g., test dates, PR merges), yielding answers that satisfy surface patterns but violate the semantic intent of the query."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Label-Event Disambiguation",
+            "principle": "When searching for label assignment, constrain queries and parsing to GitHub’s official label-related event types (e.g., 'labeled', 'unlabeled') in issue timelines—not incidental mentions of the word 'regression' in descriptions, diffs, or commit messages.",
+            "micro_example": "The crawl found 'regression' in commit messages about test cases, but those are domain terms—not GitHub label events—leading to the incorrect date 12/23/14 instead of the true label-addition timestamp.",
+            "counterfactual": "Incidental lexical matches overwhelm structural signal, causing false positives from technical jargon rather than platform-specific labeling actions."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+      "task_order": 6,
+      "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+      "is_success": false,
+      "memory_count_before": 5,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Validate structural invariants first",
+            "principle": "Before simulating dynamics or searching externally, identify and verify immutable constraints that govern state evolution, because violating them guarantees invalid trajectories regardless of downstream logic.",
+            "micro_example": "The platform always holds exactly three balls; mismodeling position shifts (e.g., assuming ball 1 stays after third-position ejection) broke the state invariant and led to wrong '1' answer.",
+            "counterfactual": "Simulations diverge from reality when foundational constraints like fixed capacity or deterministic displacement rules are ignored."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Abandon search when mechanics are self-contained",
+            "principle": "Cease external tool use immediately when the problem specifies fully deterministic, finite-state transition rules, because domain-specific heuristics from analogous systems introduce noise rather than insight.",
+            "micro_example": "Repeated web searches for 'ping-pong piston simulation' failed because the ejection logic was entirely specified in-text — no external source could improve on direct state-space analysis.",
+            "counterfactual": "Wasted effort and premature convergence occur when search replaces first-principles reasoning for closed, rule-bound systems."
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "3627a8be-a77f-41bb-b807-7e1bd4c0ebdf",
+      "task_order": 8,
+      "question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+      "is_success": true,
+      "memory_count_before": 7,
+      "has_memory_guidance": true,
+      "has_reference_trajectory": true,
+      "extracted_memory": {
+        "planning_and_decision_tips": [
+          {
+            "topic": "Discriminator stacking",
+            "principle": "Anchor searches with multiple high-specificity, low-frequency terms simultaneously, because it collapses ambiguous result spaces by exploiting the statistical rarity of co-occurring precise descriptors.",
+            "micro_example": "Using '\"2012,5015.17\" \"Science Advances\" 2021 \"shell bead\" \"chronology\"' bypassed generic archaeology summaries and surfaced the target paper directly.",
+            "counterfactual": "Without stacked discriminators, searches return noisy, topically adjacent but task-irrelevant content, delaying or preventing identification of the canonical source."
+          }
+        ],
+        "tool_and_search_tips": [
+          {
+            "topic": "Lexical fidelity extraction",
+            "principle": "Query tools for verbatim phrases—not semantic paraphrases—when retrieving quantitative claims, because abstracts often embed critical values in fixed syntactic templates that regex or pattern-matching tools preserve but LLM summarization discards.",
+            "micro_example": "Asking `inspect_file_as_text` for the 'exact phrase stating the minimum age' retrieved '≥142 ka' intact, avoiding misinterpretation as '140' or '145'.",
+            "counterfactual": "Requesting paraphrased or interpreted values causes hallucination or rounding, breaking traceability to the original textual evidence."
+          }
+        ]
+      }
+    }
+  ]
+}
