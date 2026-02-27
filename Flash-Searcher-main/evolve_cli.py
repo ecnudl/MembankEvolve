@@ -25,10 +25,10 @@ def cmd_analyze(args):
     print(f"Task logs: {args.task_logs_dir}")
     print(f"Work directory: {args.work_dir}")
     
-    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     print(f"Analysis Model: {analysis_model_id}")
     
-    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     
     evolver = MemoryEvolver(
         work_dir=args.work_dir,
@@ -66,7 +66,7 @@ def cmd_generate(args):
     print(f"\nNote: This command generates ONE memory system.")
     print(f"To generate multiple systems, use 'auto' mode with --num-systems parameter.")
     
-    generation_model_id = args.model or os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    generation_model_id = args.model or os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     print(f"Generation Model: {generation_model_id}")
     
     evolver = MemoryEvolver(
@@ -253,10 +253,10 @@ def cmd_run_all(args):
     print(f"\nNote: This workflow generates ONE memory system.")
     print(f"To generate multiple systems, use 'auto-evolve' mode with --num-systems parameter.")
     
-    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     print(f"Analysis Model: {analysis_model_id}")
     
-    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     print(f"Generation Model: {generation_model_id}")
     
     evolver = MemoryEvolver(
@@ -398,8 +398,8 @@ def cmd_auto_evolve(args):
     print(f"Clear storage per round: {args.clear_storage_per_round}")
     
     # Get model IDs
-    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
-    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+    analysis_model_id = args.model or os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
+    generation_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
     print(f"Analysis Model: {analysis_model_id}")
     print(f"Generation Model: {generation_model_id}")
     

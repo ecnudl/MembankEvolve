@@ -107,6 +107,15 @@ DEFAULT_CONFIG = {
             "max_neg_examples": 1,
             "prune_threshold": 0.3,
         },
+        MemoryType.PROMPT_BASED: {
+            "storage_dir": "./storage/prompt_based",
+            "db_path": "./storage/prompt_based/memory_db.json",
+            "enabled_prompts": ["tip", "workflow"],
+            "prompt_dir": ".",
+            "top_k": 5,
+            "embedding_model_name": "sentence-transformers/all-MiniLM-L6-v2",
+            "embedding_cache_dir": "./storage/models",
+        },
         # add new memory type upside this line
 }
 }

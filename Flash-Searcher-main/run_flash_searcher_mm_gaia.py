@@ -414,7 +414,7 @@ def main(args):
     model_config = {
         "model_id": os.environ.get("DEFAULT_MODEL"),
         "custom_role_conversions": custom_role_conversions,
-        "max_completion_tokens": 8000,  # Adjusted for qwen-plus limit (max 8192)
+        "max_completion_tokens": 8000,  # Adjusted for qwen3-max
         "api_key": os.environ.get("OPENAI_API_KEY"),
         "api_base": os.environ.get("OPENAI_API_BASE"),
     }
@@ -661,7 +661,7 @@ if __name__ == '__main__':
     parser.add_argument('--prompts_type', type=str, default="default", help='Type of prompts to use')
     parser.add_argument('--concurrency', type=int, default=1, help='Number of concurrency')
     parser.add_argument('--max_steps', type=int, default=40, help='Maximum number of steps')
-    parser.add_argument('--judge_model', type=str, default=os.getenv('DEFAULT_JUDGE_MODEL', os.getenv('DEFAULT_MODEL', 'qwen-plus')), help='Model used for immediate judgement')
+    parser.add_argument('--judge_model', type=str, default=os.getenv('DEFAULT_JUDGE_MODEL', os.getenv('DEFAULT_MODEL', 'qwen3-max')), help='Model used for immediate judgement')
     parser.add_argument('--memory_provider', type=str, default=None, help='Memory provider type (e.g., "agent_kb", "skillweaver") or None')
     parser.add_argument('--enable_memory_evolution', action='store_true', default=True,
                         help='Enable memory system evolution (take_in_memory). Default: True')

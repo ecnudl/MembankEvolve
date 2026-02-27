@@ -119,7 +119,7 @@ This tool supports the following image formats: [".jpg", ".jpeg", ".png", ".gif"
             mime_type, _ = mimetypes.guess_type(file_path)
             base64_image = self._encode_image(file_path)
             payload = {
-                "model": "gpt-4o",
+                "model": "qwen3-max",
                 "messages": [
                     {
                         "role": "user",

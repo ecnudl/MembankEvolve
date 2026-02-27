@@ -362,9 +362,210 @@ class CrawlPageTool(Tool):
         prompt = self.get_summary_prompt(query, url, truncated_content)
         
         return self.retry_predict(prompt)
-    
+
+
+class GitHubSearchTool(Tool):
+    name = "github_search"
+    description = (
+        "Search GitHub issues, pull requests, or code using the GitHub REST API. "
+        "Supports qualifiers like repo:owner/name, is:issue, is:closed, label:bug, sort:created, etc. "
+        "Use this instead of web_search when you need to query GitHub issues, PRs, or code search."
+    )
+    inputs = {
+        "query": {
+            "type": "string",
+            "description": (
+                "GitHub search query with qualifiers. "
+                "Examples: 'repo:numpy/numpy is:issue is:closed label:Regression polynomial sort:created-asc', "
+                "'repo:facebook/react is:pr is:merged sort:updated-desc'"
+            ),
+        },
+        "search_type": {
+            "type": "string",
+            "description": "Type of search: 'issues' (issues & PRs), 'code', or 'repositories'. Default: 'issues'",
+            "nullable": True,
+        },
+        "per_page": {
+            "type": "integer",
+            "description": "Number of results to return (1-30). Default: 10",
+            "nullable": True,
+        },
+    }
+    output_type = "string"
+
+    def __init__(self):
+        super().__init__()
+        self.token = os.environ.get("GITHUB_TOKEN", "")
+        self.base_url = "https://api.github.com"
+
+    def forward(self, query: str, search_type: str = "issues", per_page: int = 10) -> str:
+        search_type = search_type or "issues"
+        per_page = min(max(int(per_page or 10), 1), 30)
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+
+        url = f"{self.base_url}/search/{search_type}"
+        params = {"q": query, "per_page": per_page, "sort": "created", "order": "asc"}
+
+        # Parse sort/order from query if specified
+        if "sort:created-desc" in query:
+            params["order"] = "desc"
+            params["sort"] = "created"
+        elif "sort:created-asc" in query:
+            params["order"] = "asc"
+            params["sort"] = "created"
+        elif "sort:updated" in query:
+            params["sort"] = "updated"
+
+        try:
+            resp = requests.get(url, headers=headers, params=params, timeout=15)
+            if resp.status_code == 403:
+                return "GitHub API rate limit exceeded. Set GITHUB_TOKEN in .env to increase limits."
+            resp.raise_for_status()
+            data = resp.json()
+        except requests.RequestException as e:
+            return f"GitHub API error: {e}"
+
+        total = data.get("total_count", 0)
+        items = data.get("items", [])
+
+        if not items:
+            return f"No results found (total_count={total}). Try adjusting your query qualifiers."
+
+        results = [f"Found {total} results (showing {len(items)}):"]
+
+        for i, item in enumerate(items, 1):
+            if search_type == "issues":
+                labels = ", ".join(l.get("name", "") for l in item.get("labels", []))
+                state = item.get("state", "")
+                created = item.get("created_at", "")[:10]
+                updated = item.get("updated_at", "")[:10]
+                results.append(
+                    f"\n{i}. #{item.get('number','')} [{state}] {item.get('title','')}\n"
+                    f"   URL: {item.get('html_url','')}\n"
+                    f"   Labels: {labels or 'none'}\n"
+                    f"   Created: {created} | Updated: {updated}\n"
+                    f"   Body preview: {(item.get('body','') or '')[:200]}"
+                )
+            elif search_type == "code":
+                results.append(
+                    f"\n{i}. {item.get('path','')} in {item.get('repository',{}).get('full_name','')}\n"
+                    f"   URL: {item.get('html_url','')}"
+                )
+            else:
+                results.append(
+                    f"\n{i}. {item.get('full_name','')} - {item.get('description','')[:100]}\n"
+                    f"   URL: {item.get('html_url','')}"
+                )
+
+        return "\n".join(results)
+
+
+class GitHubIssueTool(Tool):
+    name = "github_issue_detail"
+    description = (
+        "Get detailed information about a specific GitHub issue or PR, "
+        "including its timeline events (label additions, comments, etc.). "
+        "Use this to find when a label was added to an issue."
+    )
+    inputs = {
+        "repo": {
+            "type": "string",
+            "description": "Repository in 'owner/repo' format, e.g. 'numpy/numpy'",
+        },
+        "issue_number": {
+            "type": "integer",
+            "description": "The issue or PR number",
+        },
+        "include_timeline": {
+            "type": "boolean",
+            "description": "Whether to include timeline events (label additions, etc.). Default: true",
+            "nullable": True,
+        },
+    }
+    output_type = "string"
+
+    def __init__(self):
+        super().__init__()
+        self.token = os.environ.get("GITHUB_TOKEN", "")
+        self.base_url = "https://api.github.com"
+
+    def forward(self, repo: str, issue_number: int, include_timeline: bool = True) -> str:
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+
+        # Get issue details
+        try:
+            resp = requests.get(
+                f"{self.base_url}/repos/{repo}/issues/{issue_number}",
+                headers=headers, timeout=15,
+            )
+            if resp.status_code == 404:
+                return f"Issue #{issue_number} not found in {repo}"
+            resp.raise_for_status()
+            issue = resp.json()
+        except requests.RequestException as e:
+            return f"GitHub API error: {e}"
+
+        labels = ", ".join(l.get("name", "") for l in issue.get("labels", []))
+        result = (
+            f"Issue #{issue.get('number','')} [{issue.get('state','')}]: {issue.get('title','')}\n"
+            f"URL: {issue.get('html_url','')}\n"
+            f"Labels: {labels or 'none'}\n"
+            f"Created: {issue.get('created_at','')}\n"
+            f"Closed: {issue.get('closed_at','') or 'N/A'}\n"
+            f"Updated: {issue.get('updated_at','')}\n"
+            f"Body: {(issue.get('body','') or '')[:500]}"
+        )
+
+        # Get timeline events
+        if include_timeline:
+            try:
+                headers_tl = dict(headers)
+                headers_tl["Accept"] = "application/vnd.github.mockingbird-preview+json"
+                resp_tl = requests.get(
+                    f"{self.base_url}/repos/{repo}/issues/{issue_number}/timeline",
+                    headers=headers_tl, params={"per_page": 100}, timeout=15,
+                )
+                resp_tl.raise_for_status()
+                events = resp_tl.json()
+
+                label_events = []
+                for ev in events:
+                    if ev.get("event") == "labeled":
+                        label_name = ev.get("label", {}).get("name", "")
+                        created = ev.get("created_at", "")
+                        actor = ev.get("actor", {}).get("login", "")
+                        label_events.append(f"  + Label '{label_name}' added on {created} by {actor}")
+                    elif ev.get("event") == "unlabeled":
+                        label_name = ev.get("label", {}).get("name", "")
+                        created = ev.get("created_at", "")
+                        label_events.append(f"  - Label '{label_name}' removed on {created}")
+
+                if label_events:
+                    result += "\n\nLabel Timeline:\n" + "\n".join(label_events)
+                else:
+                    result += "\n\nLabel Timeline: No label events found"
+
+            except Exception as e:
+                result += f"\n\nTimeline fetch failed: {e}"
+
+        return result
+
+
 __all__ = [
     "WikiSearchTool",
     "WebSearchTool",
     "CrawlPageTool",
+    "GitHubSearchTool",
+    "GitHubIssueTool",
 ]

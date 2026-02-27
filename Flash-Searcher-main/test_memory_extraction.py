@@ -357,7 +357,7 @@ def main():
     # LLM配置
     custom_role_conversions = {"tool-call": "assistant", "tool-response": "user"}
     model_config = {
-        "model_id": os.environ.get("DEFAULT_MODEL", "qwen-plus"),
+        "model_id": os.environ.get("DEFAULT_MODEL", "qwen3-max"),
         "custom_role_conversions": custom_role_conversions,
         "max_completion_tokens": 8000,
         "api_key": os.environ.get("OPENAI_API_KEY"),

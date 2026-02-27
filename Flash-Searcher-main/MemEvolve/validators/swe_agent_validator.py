@@ -64,7 +64,7 @@ class SWEAgentValidator:
                 return False
             
             # Get model configuration from environment variables
-            model_name = os.getenv("MSWEA_MODEL_NAME", os.getenv("DEFAULT_MODEL", "gpt-4"))
+            model_name = os.getenv("MSWEA_MODEL_NAME", os.getenv("DEFAULT_MODEL", "qwen3-max"))
             base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENAI_API_BASE")
             cost_tracking = os.getenv("MSWEA_COST_TRACKING", "ignore_errors")
             

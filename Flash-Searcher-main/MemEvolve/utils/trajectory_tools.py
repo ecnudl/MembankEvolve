@@ -268,7 +268,7 @@ class TrajectoryViewerTool(Tool):
     }
     output_type = "string"
     
-    def __init__(self, task_logs_dir: str, max_tasks: int = TRAJECTORY_VIEWER_MAX_TASKS, model_id: str = "gpt-5-mini"):
+    def __init__(self, task_logs_dir: str, max_tasks: int = TRAJECTORY_VIEWER_MAX_TASKS, model_id: str = "qwen3-max"):
         super().__init__()
         self.task_logs_dir = Path(task_logs_dir)
         self.max_tasks = max_tasks

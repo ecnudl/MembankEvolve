@@ -245,7 +245,7 @@ def main():
 
     if args.use_dmx:
         model_config = {
-            "model_id": os.environ.get("DMX_MODEL", "gpt-4o"),
+            "model_id": os.environ.get("DMX_MODEL", "qwen3-max"),
             "custom_role_conversions": custom_role_conversions,
             "max_completion_tokens": 16000,
             "api_key": os.environ.get("DMX_API_KEY"),
@@ -253,7 +253,7 @@ def main():
         }
     else:
         model_config = {
-            "model_id": os.environ.get("DEFAULT_MODEL", "qwen-plus"),
+            "model_id": os.environ.get("DEFAULT_MODEL", "qwen3-max"),
             "custom_role_conversions": custom_role_conversions,
             "max_completion_tokens": 8000,
             "api_key": os.environ.get("OPENAI_API_KEY"),
@@ -262,7 +262,7 @@ def main():
 
     # Qwen config for auxiliary tasks (judge, memory, file inspection)
     qwen_config = {
-        "model_id": os.environ.get("DEFAULT_MODEL", "qwen-plus"),
+        "model_id": os.environ.get("DEFAULT_MODEL", "qwen3-max"),
         "custom_role_conversions": custom_role_conversions,
         "max_completion_tokens": 8000,
         "api_key": os.environ.get("OPENAI_API_KEY"),
@@ -270,7 +270,7 @@ def main():
     }
 
     # Judge always uses Qwen (lasj.py client is hardcoded to OPENAI_API_KEY/BASE env vars)
-    judge_model = os.environ.get("DEFAULT_JUDGE_MODEL", os.environ.get("DEFAULT_MODEL", "qwen-plus"))
+    judge_model = os.environ.get("DEFAULT_JUDGE_MODEL", os.environ.get("DEFAULT_MODEL", "qwen3-max"))
 
     # Load tasks
     data = read_jsonl(args.infile)

@@ -20,6 +20,7 @@ from utils import safe_json_loads
 from FlashOAgents import ToolCallingAgent
 from FlashOAgents import ActionStep, PlanningStep, TaskStep, SummaryStep
 from FlashOAgents import WebSearchTool, CrawlPageTool, VisualInspectorTool, AudioInspectorTool, TextInspectorTool
+from FlashOAgents import GitHubSearchTool, GitHubIssueTool
 
 load_dotenv(override=True)
 
@@ -117,9 +118,11 @@ class MMSearchAgent(BaseAgent):
         web_tool = WebSearchTool()
         crawl_tool = CrawlPageTool(model=model)
         visual_tool = VisualInspectorTool(model, 100000)
-        text_tool = TextInspectorTool(model, 100000) 
-        audio_tool = AudioInspectorTool(model, 100000) 
-        tools = [web_tool, crawl_tool, visual_tool,text_tool,audio_tool] 
+        text_tool = TextInspectorTool(model, 100000)
+        audio_tool = AudioInspectorTool(model, 100000)
+        github_search_tool = GitHubSearchTool()
+        github_issue_tool = GitHubIssueTool()
+        tools = [web_tool, crawl_tool, visual_tool, text_tool, audio_tool, github_search_tool, github_issue_tool] 
 
         self.agent_fn = ToolCallingAgent(
             model=model,
@@ -137,7 +140,7 @@ class AnalysisAgent(BaseAgent):
     def __init__(self, model, task_logs_dir, prompts_type="default", max_steps=15, summary_model_id=None, **kwargs):
         if summary_model_id is None:
             import os
-            summary_model_id = os.getenv("DEFAULT_MODEL", "qwen-plus")
+            summary_model_id = os.getenv("DEFAULT_MODEL", "qwen3-max")
         super().__init__(model)
         
         from MemEvolve.utils.trajectory_tools import (

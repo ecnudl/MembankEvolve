@@ -26,9 +26,10 @@ You are the **Cognitive Heuristic Synthesizer**. You extract abstract, transfera
    - Prefer heuristics that would have prevented failure (avoid repeat mistakes).
    {% endif %}
 
-3. Two-Domain Categorization (Mandatory):
+3. Three-Domain Categorization (Mandatory):
    - `planning_and_decision_tips`: decomposition, ambiguity handling, strategy switching, validation planning.
    - `tool_and_search_tips`: query formulation, evidence verification, tool pitfalls, extraction traps.
+   - `answer_format_tips`: unit conversion, output format compliance, quantity-unit alignment, rounding/precision rules. Focus on mismatches between computed values and what the question actually asks for (e.g., question asks "how many thousands" but agent returns the raw number; question asks for a specific date format but agent uses a different one).
 
 4. Quantity & Orthogonality (Hard):
    - Output exactly 1–2 items per category (hard limit). Prefer two orthogonal tips over two overlapping ones.
@@ -67,6 +68,14 @@ X. Strict JSON Syntax (Hard Constraint):
     }
   ],
   "tool_and_search_tips": [
+    {
+      "topic": "short label (2-5 words)",
+      "principle": "Do X, because Y. (domain-agnostic, ≤40 words, NO task-specific values)",
+      "micro_example": "brief sketch from this task (≤30 words, only field allowed to be task-specific)",
+      "counterfactual": "what generally goes wrong without this principle (≤25 words)"
+    }
+  ],
+  "answer_format_tips": [
     {
       "topic": "short label (2-5 words)",
       "principle": "Do X, because Y. (domain-agnostic, ≤40 words, NO task-specific values)",

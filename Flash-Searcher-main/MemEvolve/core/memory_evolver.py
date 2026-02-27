@@ -49,11 +49,11 @@ class MemoryEvolver:
         self.work_dir.mkdir(parents=True, exist_ok=True)
         
         if analysis_model_id is None:
-            analysis_model_id = os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+            analysis_model_id = os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
         self.analysis_model_id = analysis_model_id
         
         if gen_model_id is None:
-            gen_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+            gen_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
         self.gen_model_id = gen_model_id
         
         # Initialize OpenAI client for generation

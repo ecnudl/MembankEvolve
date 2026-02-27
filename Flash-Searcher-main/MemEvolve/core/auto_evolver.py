@@ -40,8 +40,8 @@ class AutoEvolver:
 
     Typical usage:
         auto = AutoEvolver(
-            analysis_model_id="gpt-5",
-            gen_model_id="gpt-5",
+            analysis_model_id="qwen3-max",
+            gen_model_id="qwen3-max",
             work_root="runs/auto",
             dataset_name="gaia",
             run_provider=run_provider,
@@ -68,10 +68,10 @@ class AutoEvolver:
         clear_storage_per_round: bool = True,
     ):
         if analysis_model_id is None:
-            analysis_model_id = os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+            analysis_model_id = os.getenv("ANALYSIS_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
         
         if gen_model_id is None:
-            gen_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "gpt-5"))
+            gen_model_id = os.getenv("GENERATION_MODEL", os.getenv("DEFAULT_MODEL", "qwen3-max"))
         
         self.analysis_model_id = analysis_model_id
         self.gen_model_id = gen_model_id

@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 load_dotenv(override=True)
 
 
-def judge_webwalkerqa_answer(question, golden_answer, pred_answer, model="gpt-5-mini"):
+def judge_webwalkerqa_answer(question, golden_answer, pred_answer, model="qwen3-max"):
     """Judge if the predicted answer is correct for WebWalkerQA tasks."""
     from openai import OpenAI
     
@@ -588,7 +588,7 @@ if __name__ == '__main__':
                         help='Number of concurrent tasks (default=1 to avoid memory provider concurrency issues)')
     parser.add_argument('--max_steps', type=int, default=40, 
                         help='Maximum number of steps for agent')
-    parser.add_argument('--judge_model', type=str, default=os.getenv('DEFAULT_JUDGE_MODEL', 'gpt-5-mini'), 
+    parser.add_argument('--judge_model', type=str, default=os.getenv('DEFAULT_JUDGE_MODEL', 'qwen3-max'),
                         help='Model used for answer judgement')
     parser.add_argument('--memory_provider', type=str, default=None, 
                         help='Memory provider type (e.g., "cerebra_fusion", "riva_memory") or None')
