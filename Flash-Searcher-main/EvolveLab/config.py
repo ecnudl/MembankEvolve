@@ -116,6 +116,18 @@ DEFAULT_CONFIG = {
             "embedding_model_name": "sentence-transformers/all-MiniLM-L6-v2",
             "embedding_cache_dir": "./storage/models",
         },
+        MemoryType.MODULAR: {
+            "storage_dir": "./storage/modular",
+            "storage_type": "json",
+            "retriever_type": "semantic",
+            "retriever_config": {},
+            "enabled_prompts": ["tip", "insight"],
+            "prompt_dir": ".",
+            "top_k": 5,
+            "min_relevance": 0.0,  # Global injection threshold: skip memories below this (0=disabled, use retriever min_score instead)
+            "embedding_model_name": "sentence-transformers/all-MiniLM-L6-v2",
+            "embedding_cache_dir": "./storage/models",
+        },
         # add new memory type upside this line
 }
 }

@@ -24,3 +24,15 @@ evolve_demo_run/
 gaia.py
 gaia_subset_files/
 **/data/gaia/
+
+# external repos
+GMemory/
+
+# macOS
+.DS_Store
+
+# experiment artifacts
+**/experiments/
+**/storage/prompt_based_*/
+**/data/gaia_full/
+**/*.pip

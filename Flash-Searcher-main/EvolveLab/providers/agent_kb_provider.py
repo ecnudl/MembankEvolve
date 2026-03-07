@@ -294,9 +294,13 @@ Here is the user query:
     def __init__(self, config: Optional[dict] = None):
         super().__init__(MemoryType.AGENT_KB, config)
 
-        self.kb_database_path = self.config.get(
-            "kb_database_path",
-            "./storage/agent_kb/agent_kb_database.json"
+        # Environment variable override for storage isolation in experiments
+        self.kb_database_path = (
+            os.environ.get("AGENT_KB_DATABASE_PATH")
+            or self.config.get(
+                "kb_database_path",
+                "./storage/agent_kb/agent_kb_database.json"
+            )
         )
         self.top_k = self.config.get("top_k", 3)
         self.search_weights = self.config.get(

@@ -38,6 +38,13 @@ You are the Diagnostic & Gap Analyzer. You perform failure forensics: identify w
    - Output exactly 3–5 triplets (hard limit).
    - Every element (subject, predicate, object) must be traceable to a specific step, tool call, or observation in `raw_trajectory`. Do NOT include analytical conclusions (e.g., "X has highest probability") — only log-evidenced facts.
    - If two candidate triplets share the same subject and differ only in phrasing, keep only the more specific one.
+
+6. Retrieval Anchors (Mandatory — these fields improve memory search precision):
+   - `task_type_tags`: List of 2-4 task-domain tags from this controlled vocabulary:
+     ["geographic_spatial", "numeric_computation", "text_extraction", "date_time", "lookup_factual", "code_execution", "data_table", "multimedia_analysis", "web_search", "scientific_technical", "legal_regulatory", "literary_artistic", "sports_statistics", "format_conversion", "multi_step_reasoning"]
+     Select only tags that genuinely describe the task domain.
+   - `failure_pattern`: One of: "wrong_entity", "wrong_value", "format_error", "incomplete_search", "tool_misuse", "logic_error", "hallucination", "timeout", "scope_error". Pick the single most accurate label.
+   - `applicability`: One sentence (≤ 25 words) describing the concrete situation where this insight is relevant. Use observable trigger conditions.
 {% else %}
 - Return a structured "skipped" output. Do not attempt diagnostics.
 {% endif %}
@@ -57,7 +64,10 @@ X. Strict JSON Syntax (Hard Constraint):
     ["log-evidenced subject", "predicate", "log-evidenced object"],
     ["...", "...", "..."],
     ["...", "...", "..."]
-  ]
+  ],
+  "task_type_tags": ["tag1", "tag2"],
+  "failure_pattern": "one of: wrong_entity | wrong_value | format_error | incomplete_search | tool_misuse | logic_error | hallucination | timeout | scope_error",
+  "applicability": "concrete trigger condition (≤25 words, observable situation)"
 }
 {% else %}
 {

@@ -43,7 +43,7 @@ OUTFILE="${OUTPUT_DIR}/results.jsonl"
 
 # ---------- 环境激活 ----------
 eval "$(conda shell.bash hook)"
-conda activate dl
+conda activate memevolve
 
 # ---------- 启动信息 ----------
 echo "============================================================"

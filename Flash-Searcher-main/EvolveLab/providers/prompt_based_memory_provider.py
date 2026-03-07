@@ -219,13 +219,28 @@ class PromptBasedMemoryProvider(BaseMemoryProvider):
             "storage_dir", "./storage/prompt_based"
         )
         self.db_path = os.path.join(self.storage_dir, "memory_db.json")
-        # Support ENABLED_PROMPTS env var override
-        self.enabled_prompts: List[str] = self.config.get("enabled_prompts") or [
-            p.strip()
-            for p in os.environ.get("ENABLED_PROMPTS", "tip,workflow").split(",")
-        ]
+        # Support ENABLED_PROMPTS env var override (env takes precedence)
+        env_enabled_prompts = os.environ.get("ENABLED_PROMPTS", "").strip()
+        if env_enabled_prompts:
+            self.enabled_prompts = [
+                p.strip() for p in env_enabled_prompts.split(",") if p.strip()
+            ]
+        else:
+            self.enabled_prompts: List[str] = self.config.get(
+                "enabled_prompts", ["tip", "workflow"]
+            )
         self.prompt_dir = self.config.get("prompt_dir", ".")
-        self.top_k = self.config.get("top_k", 5)
+        env_top_k = os.environ.get("PROMPT_TOP_K", "").strip()
+        if env_top_k:
+            try:
+                self.top_k = int(env_top_k)
+            except ValueError:
+                logger.warning(
+                    f"Invalid PROMPT_TOP_K='{env_top_k}', fallback to config/default"
+                )
+                self.top_k = self.config.get("top_k", 5)
+        else:
+            self.top_k = self.config.get("top_k", 5)
         self.embedding_model_name = self.config.get(
             "embedding_model_name", "sentence-transformers/all-MiniLM-L6-v2"
         )

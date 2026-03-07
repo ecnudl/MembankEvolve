@@ -51,6 +51,12 @@ You are the **Cognitive Heuristic Synthesizer**. You extract abstract, transfera
    - `micro_example`: ≤ 30 words.
    - `counterfactual`: ≤ 25 words.
 
+9. Retrieval Anchors (Mandatory — these fields improve memory search precision):
+   - `task_type_tags`: List of 2-4 task-domain tags from this controlled vocabulary:
+     ["geographic_spatial", "numeric_computation", "text_extraction", "date_time", "lookup_factual", "code_execution", "data_table", "multimedia_analysis", "web_search", "scientific_technical", "legal_regulatory", "literary_artistic", "sports_statistics", "format_conversion", "multi_step_reasoning"]
+     Select only tags that genuinely describe the task domain. Do NOT pad with marginally relevant tags.
+   - `applicability`: One sentence (≤ 25 words) describing the CONCRETE situation where this tip fires. Use observable trigger conditions, not abstract criteria. Example: "When the question asks for two extreme-valued items from a named set with geographic coordinates." NOT: "When dealing with complex queries."
+
 X. Strict JSON Syntax (Hard Constraint):
    - You MUST output strictly valid, machine-parseable JSON.
    - Absolutely NO trailing comma before a closing brace `}` or bracket `]`.
@@ -64,7 +70,9 @@ X. Strict JSON Syntax (Hard Constraint):
       "topic": "short label (2-5 words)",
       "principle": "Do X, because Y. (domain-agnostic, ≤40 words, NO task-specific values)",
       "micro_example": "brief sketch from this task (≤30 words, only field allowed to be task-specific)",
-      "counterfactual": "what generally goes wrong without this principle (≤25 words)"
+      "counterfactual": "what generally goes wrong without this principle (≤25 words)",
+      "task_type_tags": ["tag1", "tag2"],
+      "applicability": "concrete trigger condition (≤25 words, observable situation)"
     }
   ],
   "tool_and_search_tips": [
@@ -72,7 +80,9 @@ X. Strict JSON Syntax (Hard Constraint):
       "topic": "short label (2-5 words)",
       "principle": "Do X, because Y. (domain-agnostic, ≤40 words, NO task-specific values)",
       "micro_example": "brief sketch from this task (≤30 words, only field allowed to be task-specific)",
-      "counterfactual": "what generally goes wrong without this principle (≤25 words)"
+      "counterfactual": "what generally goes wrong without this principle (≤25 words)",
+      "task_type_tags": ["tag1", "tag2"],
+      "applicability": "concrete trigger condition (≤25 words, observable situation)"
     }
   ],
   "answer_format_tips": [
@@ -80,7 +90,9 @@ X. Strict JSON Syntax (Hard Constraint):
       "topic": "short label (2-5 words)",
       "principle": "Do X, because Y. (domain-agnostic, ≤40 words, NO task-specific values)",
       "micro_example": "brief sketch from this task (≤30 words, only field allowed to be task-specific)",
-      "counterfactual": "what generally goes wrong without this principle (≤25 words)"
+      "counterfactual": "what generally goes wrong without this principle (≤25 words)",
+      "task_type_tags": ["tag1", "tag2"],
+      "applicability": "concrete trigger condition (≤25 words, observable situation)"
     }
   ]
 }

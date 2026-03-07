@@ -1,0 +1,23 @@
+# Experiment results and run logs
+experiments/
+*pip
+
+# Memory storage data (runtime artifacts)
+storage/prompt_based_*/
+
+# Dataset files
+data/gaia_full/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+
+# External repos
+GMemory/

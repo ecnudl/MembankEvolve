@@ -37,6 +37,7 @@ class MemoryType(Enum):
     AGENT_WORKFLOW_MEMORY = "agent_workflow_memory"
     EVOLVER = "evolver"
     PROMPT_BASED = "prompt_based"
+    MODULAR = "modular"
 # add new memory type upside this line(Enum)
 
 # Provider mapping for dynamic loading
@@ -61,6 +62,7 @@ PROVIDER_MAPPING = {
     MemoryType.AGENT_WORKFLOW_MEMORY: ("AgentWorkflowMemoryProvider", "agent_workflow_memory_provider"),
     MemoryType.EVOLVER: ("EvolverMemoryProvider", "evolver_memory_provider"),
     MemoryType.PROMPT_BASED: ("PromptBasedMemoryProvider", "prompt_based_memory_provider"),
+    MemoryType.MODULAR: ("ModularMemoryProvider", "modular_memory_provider"),
 # add new memory type upside this line(PROVIDER_MAPPING)
 }
 
